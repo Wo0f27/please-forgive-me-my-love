@@ -73,6 +73,7 @@
   function go(index) {
     if (index < 0 || index >= scenes.length || index === current) return;
     const old = scenes[current];
+    if (current === 2 && index === 1) envelopeStage.classList.remove("is-finishing");
     old.classList.remove("is-current");
     old.classList.add(index > current ? "was-before" : "was-after");
     old.setAttribute("aria-hidden","true");
@@ -183,6 +184,7 @@
     if (phase !== "reading") return;
     cancelSequence();
     rememberedScrollTop = paper.scrollTop;
+    envelopeStage.classList.toggle("is-finishing",advanceToEnding);
     phase = "refolding";
     syncEnvelope();
     announce("The letter is folding.");
@@ -233,6 +235,7 @@
     rememberedScrollTop = 0;
     phase = "closed";
     paper.scrollTop = 0;
+    envelopeStage.classList.remove("is-finishing");
     garden.classList.remove("is-blooming","is-grown");
     heartLayer.replaceChildren();
     syncEnvelope();

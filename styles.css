@@ -570,3 +570,10 @@ body{background:#fff1e9;color:var(--text)}
   .ambient-petals i{animation:none!important;opacity:0!important}
   .envelope.is-reading .parchment{transition:none!important}
 }
+
+/* Do not reintroduce the envelope headline between sealing and the ending.
+   It must not show through the crossfade to "I love you". */
+.envelope-stage.is-finishing .envelope-heading,
+.envelope-stage.is-finishing .envelope-companion{
+  opacity:0!important;visibility:hidden!important;transition:none!important;
+}

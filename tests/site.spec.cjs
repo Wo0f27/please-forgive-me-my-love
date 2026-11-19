@@ -505,3 +505,19 @@ test("envelope heading and companion stay concealed until sealing finishes", asy
   await expect(heading).toHaveCSS("opacity","0");
   await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:3200});
 });
+
+
+test("the envelope greeting never bleeds into the closing scene", async ({page}) => {
+  await openTheActualLetter(page);
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7300});
+  await expect(page.locator(".envelope-stage")).toHaveClass(/is-finishing/);
+  await expect(page.locator(".envelope-heading")).toHaveCSS("opacity","0");
+  await expect(page.locator(".envelope-companion")).toHaveCSS("opacity","0");
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.locator("#sealed")).toHaveClass(/is-current/);
+  await expect(page.locator(".envelope-stage")).not.toHaveClass(/is-finishing/);
+});
