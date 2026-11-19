@@ -307,3 +307,19 @@ test("reduced motion reveals all flowers without unfolding animation", async ({p
   expect(parseFloat(data.offset)).toBe(0);
   expect(parseFloat(data.leafOpacity)).toBe(1);
 });
+
+
+test("jumping directly to the end reveals the flowers rather than an empty area", async ({page}) => {
+  await openTheActualLetter(page);
+  const paper=page.locator("#letter-paper");
+  await paper.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
+  const garden=page.locator(".paper-garden");
+  await expect(garden).toHaveClass(/is-grown/);
+  const shapes=await garden.evaluate(el=>({
+    stem:getComputedStyle(el.querySelector(".garden-stem")).strokeDashoffset,
+    petals:getComputedStyle(el.querySelector(".garden-petals")).opacity
+  }));
+  expect(parseFloat(shapes.stem)).toBe(0);
+  expect(parseFloat(shapes.petals)).toBe(1);
+  await page.screenshot({path:test.info().outputPath("flowers-at-letter-end.png"),fullPage:false});
+});
