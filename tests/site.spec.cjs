@@ -197,3 +197,36 @@ test("scrollbars are visually hidden while native reading scroll remains enabled
   expect(metrics.scroll).toBeGreaterThan(metrics.view);
   expect(metrics.scrollbar).toBe("none");
 });
+
+
+test("local cutout artwork keeps opaque cat bodies and transparent surrounding corners", async ({page}) => {
+  await page.goto("/");
+  const sources=[
+    ["tender-hug", .68, .43],
+    ["ending-hug", .65, .45],
+    ["comfort", .49, .44],
+    ["sad-tears", .48, .53],
+    ["little-kiss", .56, .49]
+  ];
+  for(const [name,x,y] of sources){
+    const result=await page.evaluate(async ({name,x,y})=>{
+      const img=new Image();
+      img.src="./assets/stickers/"+name+".png";
+      await img.decode();
+      const canvas=document.createElement("canvas");
+      canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+      const ctx=canvas.getContext("2d",{willReadFrequently:true});
+      ctx.drawImage(img,0,0);
+      return {
+        width:canvas.width,
+        height:canvas.height,
+        corner:ctx.getImageData(0,0,1,1).data[3],
+        body:ctx.getImageData(Math.floor(x*canvas.width),Math.floor(y*canvas.height),1,1).data[3]
+      };
+    },{name,x,y});
+    expect(result.width,name).toBeGreaterThan(100);
+    expect(result.corner,name).toBeLessThan(40);
+    expect(result.body,name).toBeGreaterThan(160);
+  }
+  await expect(page.locator('img[src*="tenor.com"]')).toHaveCount(0);
+});
