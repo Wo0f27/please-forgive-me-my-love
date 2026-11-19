@@ -173,7 +173,7 @@ p{line-height:1.7}
  .envelope-flap{height:89px}
  .envelope-wax{top:calc(50% + 40px)}
  .envelope-companion{top:calc(50% - 104px)}
- .envelope.is-open:not(.is-reading) .letter-paper{top:calc(50% - 148px)}
+ .envelope.is-open.is-extracting .letter-paper,.envelope.is-open.is-inserting .letter-paper{top:calc(50% - 148px)}
  .ending{gap:9px}
  .art-ending{max-height:24vh}
  .ending h2{font-size:clamp(40px,7vw,53px)}
@@ -192,4 +192,154 @@ p{line-height:1.7}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;transition-delay:0s!important}
  .scene{transform:none!important}
+}
+
+
+/* Version 7 — cozy afternoon stationery, lifted from the Ash garden palette.
+   Motion follows the paper: extract → unfold → read → refold → insert.
+   These overrides keep the existing responsive envelope layout intact. */
+:root{
+  color-scheme:light;
+  --night:#fff0e9;--text:#674a55;--quiet:#957b7d;--warm:#a7667e;
+  --paper:#fffaf0;--ink:#51423d;
+}
+body{background:#fff1e9;color:var(--text)}
+.room{
+  background:
+    radial-gradient(ellipse 56% 57% at 78% 30%,#f5bacbac,transparent 79%),
+    radial-gradient(ellipse 47% 53% at 19% 76%,#ffe2c6aa,transparent 78%),
+    linear-gradient(126deg,#fff9ee 0%,#fce7eb 52%,#fff2e7 100%);
+}
+.room:after{background:linear-gradient(90deg,#fff8e83b,transparent 47%,#fff3e65e)}
+.lamplight{background:#ed9db33b;filter:blur(85px)}
+.scene{
+  filter:blur(3px);
+  transform:translateY(23px) scale(.983);
+  transition:opacity .65s ease,transform .7s var(--ease),filter .6s ease,visibility 0s linear .7s;
+}
+.scene.is-current{
+  filter:none;transform:translateY(0) scale(1);
+  transition:opacity .65s ease,transform .7s var(--ease),filter .6s ease,visibility 0s;
+}
+.scene.was-before{transform:translateY(-25px) scale(.985)}
+.scene.was-after{transform:translateY(25px) scale(.985)}
+.opening h1,.ending h2,.envelope-heading{color:#774c62}
+.opening p,.ending p{color:#735963}
+.opening .soft-line{color:#a4637b}
+.art-opening{filter:drop-shadow(0 11px 17px #ac728337);animation:catFloat 4.2s ease-in-out infinite}
+.art-ending{filter:drop-shadow(0 9px 18px #b97e8c37)}
+.envelope-heading{color:#79566b}
+.envelope-companion{filter:drop-shadow(0 7px 14px #c58f9b59)}
+.envelope-back{
+  background:linear-gradient(120deg,#f1bac9,#e7a7b7);
+  box-shadow:0 16px 36px #c489993c;
+}
+.envelope-flap{background:#e3a0b3}
+.envelope-pocket{background:#f5c5d0}
+.envelope-pocket:after{background:#e8aebda8}
+.envelope-wax{background:#bf7995;border-color:#efc3d3;color:#fff5ee}
+.letter-paper{background:var(--paper);border-color:#eacbbd;box-shadow:3px 9px 18px #be809236}
+.envelope.is-reading .letter-paper{box-shadow:0 13px 36px #bd879f4a;outline-offset:4px}
+.envelope.is-reading .parchment,.parchment{
+  background:
+    repeating-linear-gradient(0deg,transparent 0 36px,#d6ab9420 36px,transparent 37px),
+    linear-gradient(90deg,#eed9c8 0%,#fffaef 6%,#fffaf2 49%,#f6e5d3 96%,#e5cbb8 100%);
+}
+.parchment:before{box-shadow:inset 13px 0 20px #d6b69c36,inset -13px 0 20px #d1ac9b3d}
+.parchment-top{background:linear-gradient(#fffdf6,#f4e7d6);box-shadow:0 4px 9px #be9b8435}
+.letter-text p{color:#54403f}
+.letter-text .letter-hello,.letter-text .letter-signoff{color:#995d72}
+.parchment-end{background:linear-gradient(170deg,#f5e5d0,#fffdf7)}
+.letter-illustration img{mix-blend-mode:normal}
+.opening-link{border-color:#f5c4d2;background:linear-gradient(145deg,#f5c5d3,#e6a6b9);
+  box-shadow:0 10px 23px #bb82913c,inset 0 1px #fff6efd9;color:#704352}
+.opening-link:hover{box-shadow:0 12px 27px #b97f8c53,inset 0 1px #fff6efd9}
+.opening-link .button-seal{background:#b8708d}
+.again{color:#9d6278;border-bottom-color:#ce9eac}
+.again:hover{color:#704a61}
+.accessible-navigation button{background:#fffaf1;color:#74516a;border-color:#d7acbd}
+.last-heart{color:#ac7087;min-width:52px;min-height:51px;margin-top:19px;
+  border-radius:50%;transition:transform .25s,color .25s}
+.last-heart:hover{color:#854762;transform:scale(1.15)}
+.last-heart:disabled{opacity:.45;cursor:default}
+
+/* Fold choreography. The text is concealed during physical folding, so
+   its content never flashes inside the tiny envelope. */
+.paper-crease{
+  position:absolute;inset:0;z-index:23;pointer-events:none;opacity:0;
+  background:linear-gradient(180deg,#fffaf3d6 0%,#e9bfac8a 32%,#fffaf3cc 34%,
+    #fffaf3d0 63%,#e2b0a084 65%,#fffaf3c9 68%,#fce9ddc7 100%);
+  transition:opacity .25s ease;
+}
+.envelope.is-unfolding .letter-paper,.envelope.is-refolding .letter-paper{
+  top:max(18px,calc(50% - 165px));
+  width:min(440px,calc(100% - 30px));
+  height:min(56vh,380px);
+  transform:translate(-50%,0) scale(1);
+  z-index:15;overflow:hidden;border-radius:4px;
+  box-shadow:0 18px 36px #b8789854;
+  transition:top .58s var(--ease),height .58s var(--ease),width .58s var(--ease),
+    transform .58s var(--ease),box-shadow .48s ease;
+}
+.envelope.is-unfolding .paper-crease,.envelope.is-refolding .paper-crease,
+.envelope.is-inserting .paper-crease{opacity:.96}
+.envelope.is-unfolding .parchment,.envelope.is-refolding .parchment,
+.envelope.is-inserting .parchment{opacity:0;transform:scaleY(.94);transform-origin:top;
+  transition:opacity .3s ease,transform .55s var(--ease)}
+.envelope.is-reading .parchment{opacity:1;transform:none;
+  transition:opacity .5s ease .12s,transform .6s var(--ease)}
+.envelope.is-reading .paper-crease{opacity:0}
+.envelope.is-inserting .letter-paper{
+  top:calc(50% - 124px);
+  width:min(322px,89vw);height:140px;
+  transform:translate(-50%,0) scale(.93);z-index:2;
+  overflow:hidden;
+  transition:top .58s var(--ease),width .58s var(--ease),height .58s var(--ease),
+    transform .58s var(--ease);
+}
+
+/* Light petals drift only between scenes, never in front of paragraphs. */
+.scene-petals{position:absolute;inset:0;z-index:29;pointer-events:none;overflow:hidden}
+.scene-petals i{position:absolute;left:50%;top:52%;width:13px;height:18px;opacity:0;
+  background:#eda8bc;border-radius:92% 3% 92% 90%;transform:rotate(20deg)}
+.scene-petals i:nth-child(1){--x:-115px;--y:-130px;--turn:-125deg;--delay:0s;background:#f2a9b3}
+.scene-petals i:nth-child(2){--x:120px;--y:-115px;--turn:140deg;--delay:.08s;background:#e8b6d0}
+.scene-petals i:nth-child(3){--x:-68px;--y:92px;--turn:83deg;--delay:.13s;background:#f6cdb5}
+.scene-petals i:nth-child(4){--x:84px;--y:107px;--turn:-112deg;--delay:.04s;background:#ecc2d8}
+.scene-petals i:nth-child(5){--x:9px;--y:-157px;--turn:160deg;--delay:.17s;background:#f3b7c6}
+.scene-petals.is-playing i{animation:petalDrift .94s var(--delay) ease-out both}
+@keyframes petalDrift{0%{opacity:0;transform:translate(0,6px) rotate(16deg) scale(.65)}
+  27%{opacity:.88}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(var(--turn)) scale(1.2)}}
+@keyframes catFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}}
+
+/* Ash's three-flower SVG, moved onto the real letter rather than a scene.
+   The original pastel petals, stems, and leaves are preserved. */
+.paper-garden{width:min(100%,390px);margin:31px auto 23px;position:relative;aspect-ratio:420/300;
+  overflow:hidden;border:0;background:transparent}
+.paper-garden .bloom-art{display:block;width:100%;height:100%}
+.paper-garden .garden-flower .garden-stem{stroke-dasharray:520;stroke-dashoffset:520}
+.paper-garden .garden-flower .garden-leaf,.paper-garden .garden-flower .garden-petals{
+  opacity:0;transform-box:fill-box;transform-origin:center bottom}
+.paper-garden.is-blooming .garden-stem{animation:paperStem 1.55s calc(.08s + var(--bloom-delay)) ease-out forwards}
+.paper-garden.is-blooming .garden-leaf{animation:paperLeaf .9s calc(.95s + var(--bloom-delay)) ease-out forwards}
+.paper-garden.is-blooming .garden-leaf-b{animation-delay:calc(1.22s + var(--bloom-delay))}
+.paper-garden.is-blooming .garden-petals{animation:paperPetals .95s calc(1.38s + var(--bloom-delay)) cubic-bezier(.2,.85,.2,1) forwards}
+@keyframes paperStem{to{stroke-dashoffset:0}}
+@keyframes paperLeaf{from{opacity:0;transform:scale(.06) rotate(-10deg)}
+ to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes paperPetals{from{opacity:0;transform:scale(.04) rotate(-16deg)}
+ 80%{opacity:1}to{opacity:1;transform:scale(1) rotate(0)}}
+@media(max-width:720px){
+  .paper-garden{width:min(100%,310px);margin:19px auto 15px}
+  .envelope.is-inserting .letter-paper{width:min(305px,87vw)}
+}
+@media(max-height:700px){
+  .envelope.is-open.is-inserting .letter-paper,.envelope.is-open.is-extracting .letter-paper{top:calc(50% - 148px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .art-opening{animation:none!important}
+  .scene-petals.is-playing i{animation:none!important;opacity:0!important}
+  .paper-garden .garden-flower .garden-stem{stroke-dashoffset:0!important}
+  .paper-garden .garden-flower .garden-leaf,.paper-garden .garden-flower .garden-petals{
+    opacity:1!important;transform:none!important}
 }

@@ -86,6 +86,7 @@ test("the envelope can fold back without destroying or duplicating the letter", 
 
 test("mobile layout keeps the letter within the viewport and images have fallbacks", async ({page}) => {
   await openTheActualLetter(page);
+  await page.waitForTimeout(670);
   const paper = await page.locator("#letter-paper").boundingBox();
   const viewport = page.viewportSize();
   expect(paper.x).toBeGreaterThanOrEqual(-2);
@@ -160,21 +161,21 @@ test("short browser and phone viewports keep the entire reading window inside th
   await page.screenshot({path:test.info().outputPath("short-screen.png"),fullPage:false});
 });
 
-test("tucked-corner control closes the parchment and reopening resumes reading position", async ({page}) => {
+test("Escape refolds and reinserts the paper; reopening restores scroll progress", async ({page}) => {
   await openTheActualLetter(page);
   const paper=page.locator("#letter-paper");
-  const tuck=page.locator("#tuck-away");
-  await expect(tuck).toBeVisible();
-  await expect(tuck).toBeEnabled();
   await paper.evaluate(el=>{el.scrollTop=Math.floor(el.scrollHeight*.48);el.dispatchEvent(new Event("scroll"));});
   const before=await paper.evaluate(el=>el.scrollTop);
   expect(before).toBeGreaterThan(100);
-  await tuck.click();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/);
+  await expect(page.locator("#envelope")).toHaveClass(/is-inserting/,{timeout:4500});
   await expect(page.locator("#envelope")).not.toHaveClass(/is-open/,{timeout:4500});
-  await expect(tuck).toBeDisabled();
+  await expect(page.locator("#letter-paper")).toHaveAttribute("aria-hidden","true");
   await page.locator("#envelope-cover").click();
-  await expect(page.locator("#envelope")).toHaveClass(/is-reading/,{timeout:4500});
-  await expect.poll(()=>paper.evaluate(el=>el.scrollTop),{timeout:5000}).toBeGreaterThan(before-75);
+  await expect(page.locator("#envelope")).toHaveClass(/is-unfolding/,{timeout:3500});
+  await expect(page.locator("#envelope")).toHaveClass(/is-reading/,{timeout:3500});
+  await expect.poll(()=>paper.evaluate(el=>el.scrollTop),{timeout:3500}).toBeGreaterThan(before-75);
   await expect(page.locator("#sealed")).toHaveClass(/is-current/);
 });
 
@@ -230,4 +231,79 @@ test("local cutout artwork keeps opaque cat bodies and transparent surrounding c
     expect(result.body,name).toBeGreaterThan(160);
   }
   await expect(page.locator('img[src*="tenor.com"]')).toHaveCount(0);
+});
+
+
+
+test("the letter physically extracts before unfolding and refolds before insertion", async ({page}) => {
+  await page.goto("/");
+  await page.locator("#start-reading").click();
+  const env=page.locator("#envelope");
+  await page.locator("#envelope-cover").click();
+  await expect(env).toHaveClass(/is-extracting/);
+  await expect(env).toHaveClass(/is-unfolding/,{timeout:3400});
+  await expect.poll(() => page.locator("#letter-paper").evaluate(el=>el.getBoundingClientRect().height))
+    .toBeGreaterThan(170);
+  await expect(env).toHaveClass(/is-reading/,{timeout:3400});
+  await expect(page.locator("#letter-paper")).toHaveAttribute("aria-hidden","false");
+  await page.locator("#letter-paper").evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
+  await page.locator("#last-heart").click();
+  await expect(env).toHaveClass(/is-refolding/);
+  await expect(env).toHaveClass(/is-inserting/,{timeout:3400});
+  await expect(env).toHaveClass(/is-sealing/,{timeout:3400});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:4000});
+  await expect(env).not.toHaveClass(/is-open/);
+});
+
+test("the only visible way forward from the completed letter is its final heart", async ({page}) => {
+  await openTheActualLetter(page);
+  await expect(page.locator("#tuck-away")).toHaveCount(0);
+  const paper=page.locator("#letter-paper");
+  await paper.evaluate(el=>{el.scrollTop=el.scrollHeight*.45;});
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#sealed")).toHaveClass(/is-current/);
+  await paper.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
+  await expect(page.locator("#last-heart")).toHaveAttribute("aria-label","Fold the letter and read the last message");
+  await page.locator("#last-heart").click();
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:4200});
+});
+
+test("Ash's three original flowers bloom within the parchment", async ({page}) => {
+  await openTheActualLetter(page);
+  const garden=page.locator("#letter-paper .paper-garden");
+  await expect(garden).toHaveCount(1);
+  await expect(garden.locator(".garden-flower")).toHaveCount(3);
+  await expect(garden.locator(".garden-petal")).toHaveCount(18);
+  await garden.scrollIntoViewIfNeeded();
+  await expect(garden).toHaveClass(/is-blooming/,{timeout:3000});
+  await expect(page.locator("#sealed")).toHaveClass(/is-current/);
+});
+
+test("the overall palette is pastel and transitions remain unobtrusive", async ({page}) => {
+  await page.goto("/");
+  const visual=await page.evaluate(()=>({
+    colorScheme:getComputedStyle(document.documentElement).colorScheme,
+    background:getComputedStyle(document.body).backgroundColor,
+    backgroundArt:getComputedStyle(document.querySelector(".room")).backgroundImage
+  }));
+  expect(visual.colorScheme).toContain("light");
+  expect(visual.background).toBe("rgb(255, 241, 233)");
+  expect(visual.backgroundArt).toContain("radial-gradient");
+  await page.locator("#start-reading").click();
+  await expect(page.locator("#scene-petals")).toHaveClass(/is-playing/);
+});
+
+test("reduced motion reveals all flowers without unfolding animation", async ({page}) => {
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await openTheActualLetter(page);
+  const petals=page.locator("#scene-petals");
+  await expect(petals).not.toHaveClass(/is-playing/);
+  const garden=page.locator(".paper-garden");
+  const data=await garden.evaluate(el=>{
+    const stem=el.querySelector(".garden-stem");
+    const leaf=el.querySelector(".garden-leaf");
+    return {offset:getComputedStyle(stem).strokeDashoffset,leafOpacity:getComputedStyle(leaf).opacity};
+  });
+  expect(parseFloat(data.offset)).toBe(0);
+  expect(parseFloat(data.leafOpacity)).toBe(1);
 });
