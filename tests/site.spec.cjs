@@ -146,6 +146,7 @@ test("short browser and phone viewports keep the entire reading window inside th
     {width:844,height:390}
   ]) {
     await page.setViewportSize(size);
+    await page.waitForTimeout(760); // viewport resize transition must finish
     const metrics=await page.locator("#letter-paper").evaluate(el => {
       const r=el.getBoundingClientRect();
       return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,scroll:el.scrollHeight,view:el.clientHeight};
