@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#faf3ed">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="description" content="A little letter, and a sincere apology.">
+<title>I Should Have Listened — A Letter for You</title>
+<style>
+:root{--cream:#faf3ed;--paper:#fffdf9;--ink:#554544;--muted:#85716e;--rose:#b96f78;--blush:#f4dfdf;--sage:#a2ae99;--line:#e9dcd5;--width:1030px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.75;-webkit-font-smoothing:antialiased}
+a{color:inherit}button{font:inherit}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--rose);outline-offset:5px}
+.skip-link{position:absolute;top:-60px;left:12px;padding:8px 15px;background:white;z-index:20}.skip-link:focus{top:10px}
+.progress{position:fixed;top:0;left:0;z-index:30;height:3px;width:100%;pointer-events:none}.progress span{display:block;width:100%;height:100%;background:var(--rose);transform:scaleX(0);transform-origin:left}
+.topbar{position:relative;z-index:5;max-width:1180px;margin:auto;padding:25px 32px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{text-decoration:none;font-family:Arial,sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase}.brand b{font:normal 1.7rem Georgia,serif;vertical-align:middle;color:var(--rose);padding-right:7px}
+.top-link{font:600 .78rem Arial,sans-serif;text-decoration:none;border-bottom:1px solid var(--rose);padding-bottom:4px}
+.hero{min-height:calc(100svh - 85px);display:grid;align-content:center;position:relative;overflow:hidden;padding:50px 30px 80px}
+.hero:before{content:"";position:absolute;width:620px;height:620px;background:#f7e4e0;border-radius:50%;top:-260px;right:-260px;filter:blur(25px);opacity:.75}
+.hero-inner{max-width:var(--width);width:100%;margin:auto;display:grid;grid-template-columns:.93fr 1.07fr;align-items:center;gap:7%;z-index:1}
+.art-side{position:relative;text-align:center;display:grid;justify-items:center;gap:20px}
+.sticker-card{width:100%;max-width:370px;aspect-ratio:1/1.02;background:var(--paper);border:1px solid #f0e3da;border-radius:49% 49% 44% 44%;display:grid;place-items:center;box-shadow:0 28px 80px #a7716830;transform:rotate(-3deg);position:relative}
+.sticker-card:before{content:"";position:absolute;inset:14px;border:1px dashed #ebd8d3;border-radius:inherit}
+.sticker-button{border:0;background:transparent;cursor:pointer;position:relative;z-index:1;width:83%;padding:8px;transform:rotate(3deg);transition:transform .35s}
+.sticker-button:hover{transform:rotate(3deg) scale(1.04)}
+.sticker-button img{display:block;width:100%;height:auto;mix-blend-mode:multiply}
+.sticker-heart{position:absolute;top:6%;right:12%;color:#d27681;font-size:44px;opacity:0;pointer-events:none}
+.sticker-button.pop .sticker-heart{animation:heartpop .9s ease-out forwards}
+.sticker-caption{font:italic 1rem Georgia,serif;color:var(--muted);margin:0}
+.art-label{position:absolute;top:-30px;left:0;z-index:2;font:italic 1.1rem Georgia,serif;color:var(--rose);transform:rotate(-8deg)}
+.tiny-star{position:absolute;color:#d5b6a8;font-size:28px}.s1{right:2%;top:8%}.s2{left:-2%;bottom:24%}
+.eyebrow,.chapter-kicker{display:block;font:700 .7rem Arial,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--rose)}
+h1,h2,h3,p{margin-top:0}h1{font-size:clamp(3rem,5.5vw,5.5rem);line-height:1.06;letter-spacing:-.06em;margin:20px 0 29px;font-weight:normal}
+h1 em,h2 em{color:var(--rose);font-weight:normal}h2{font-size:clamp(2.5rem,4.2vw,4.3rem);line-height:1.13;letter-spacing:-.055em;font-weight:normal;margin:17px 0 25px}
+.hero-text{font-size:1.12rem;color:#655654;line-height:1.9;max-width:530px}
+.envelope-open{display:flex;align-items:center;gap:17px;border:0;background:transparent;margin:30px 0 9px;padding:0;cursor:pointer;text-align:left;color:var(--ink)}
+.env{display:block;width:90px;height:66px;position:relative;filter:drop-shadow(0 8px 7px #bb979140)}
+.env-back,.env-front,.env-flap,.env-sheet{position:absolute;left:0;right:0}
+.env-back{inset:7px 0 0;background:#e8b7b3;border-radius:6px}
+.env-sheet{left:20%;right:20%;top:17px;height:38px;background:#fffdf7;border-radius:3px;text-align:center;color:#c0787d;transition:transform .65s}
+.env-front{bottom:0;height:44px;background:#eecac3;clip-path:polygon(0 0,50% 65%,100% 0,100% 100%,0 100%);border-radius:0 0 6px 6px;z-index:2}
+.env-flap{top:7px;height:33px;background:#dbaba7;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .45s;z-index:3}
+.envelope-open.opened .env-flap{transform:rotateX(180deg);z-index:0}
+.envelope-open.opened .env-sheet{transform:translateY(-27px)}
+.envelope-open .label{font:700 .82rem Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--rose);padding-bottom:5px}
+.envelope-open:hover .label{color:var(--rose)}
+.no-pressure{font:.76rem/1.65 Arial,sans-serif;color:var(--muted);margin:0 0 0 107px}
+.scroll-down{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);text-decoration:none;font:italic .78rem Georgia,serif;letter-spacing:.08em;color:#9f8985}
+.section{padding:110px 30px;scroll-margin-top:20px}
+.inner{max-width:var(--width);margin:0 auto}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10%;align-items:start}
+.prose{font-size:1.12rem;line-height:1.95}.prose p{margin-bottom:23px}
+.quote{margin-top:34px;background:white;border-left:3px solid #d9a7a5;padding:25px 30px;box-shadow:0 13px 40px #90665b0d}
+.quote span{color:var(--rose);font-size:1.7rem;line-height:1}
+.quote p{font-style:italic;margin:0}
+.chapter-kicker{margin:0}
+.center{text-align:center}.center-heading{max-width:760px;margin:18px auto 20px;text-align:center}
+.center-intro{max-width:560px;margin:0 auto 37px;text-align:center;color:var(--muted)}
+.tinted{background:#f5e9e4;border-top:1px solid #f0e1dc;border-bottom:1px solid #f0e1dc}
+.notes{display:grid;gap:12px;max-width:800px;margin:auto}
+.note{background:var(--paper);border:1px solid #ecd9d5;border-radius:12px;box-shadow:0 7px 20px #a0776810}
+.note summary{padding:20px 25px;cursor:pointer;list-style:none;display:flex;gap:20px;align-items:center;font-size:1.12rem}
+.note summary::-webkit-details-marker{display:none}
+.note .n{font:700 .76rem Arial,sans-serif;color:var(--rose)}
+.note summary strong{flex:1;font-weight:normal}
+.note .plus{font:1.8rem Georgia,serif;color:var(--rose);transition:transform .25s}
+.note[open] .plus{transform:rotate(45deg)}
+.note .body{padding:0 30px 25px 67px;color:#71605d;line-height:1.8}
+.small-note{text-align:center;margin:26px 0 0;color:var(--muted);font:italic .9rem Georgia,serif}
+.heading-aside{color:var(--muted);max-width:410px;line-height:1.85}
+.steps{list-style:none;margin:0;padding:0}.steps li{display:grid;grid-template-columns:44px 1fr;gap:15px;padding:0 0 27px;margin-bottom:27px;border-bottom:1px solid var(--line)}.steps li:last-child{border-bottom:0}
+.step-no{font:700 .85rem Arial,sans-serif;color:var(--rose);padding-top:6px}.steps h3{font-size:1.25rem;font-weight:normal;margin:0 0 7px}.steps p{margin:0;color:#75635f;line-height:1.8}
+.letter-area{background:linear-gradient(180deg,#f8ebe7,#f7efea 80%);border-top:1px solid #f0e1dc}
+.letter-paper{max-width:740px;margin:43px auto 35px;background:#fffdf9;padding:65px clamp(26px,7vw,85px) 40px;position:relative;box-shadow:0 22px 75px #9e77702b;transform:rotate(-.4deg)}
+.letter-paper:before{content:"";position:absolute;left:18px;right:18px;top:18px;bottom:18px;border:1px solid #eee0d7;pointer-events:none}
+.tape{position:absolute;top:-13px;width:86px;height:28px;background:#e9c7bf99;z-index:2}.tape.left{left:22px;transform:rotate(-20deg)}.tape.right{right:20px;transform:rotate(15deg)}
+.paper-top{display:flex;justify-content:space-between;border-bottom:1px solid #eadfd9;padding-bottom:20px;margin-bottom:31px;color:#ad8c84;font:700 .67rem Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.paper-top b{font:normal 1.4rem Georgia,serif;color:var(--rose)}
+.letter-paper p{font-size:1.07rem;line-height:1.98;margin-bottom:22px;position:relative;z-index:1}
+.letter-paper .salutation{font-size:1.42rem;margin-bottom:28px}
+.letter-paper .signature{font-style:italic;margin-top:30px}
+.signature span{font-size:1.7rem;color:var(--rose)}
+.letter-small-sticker{display:block;width:115px;height:auto;margin-left:auto;mix-blend-mode:multiply;opacity:.92}
+.after{max-width:680px;text-align:center;margin:0 auto 18px;font-style:italic;color:var(--muted)}
+.again{display:table;margin:18px auto 0;font:.8rem Arial,sans-serif;text-decoration:none;border-bottom:1px solid var(--rose);padding-bottom:5px}
+.footer{text-align:center;padding:27px 20px 32px;color:var(--muted);font:italic .85rem Georgia,serif}
+.footer .credit{font:normal .68rem/1.6 Arial,sans-serif;color:#9e8b85;max-width:620px;margin:7px auto 0}
+@keyframes heartpop{0%{transform:translateY(12px) scale(.5);opacity:0}25%{opacity:1}70%{opacity:1}100%{transform:translateY(-45px) scale(1.25);opacity:0}}
+@media(max-width:760px){.topbar{padding:20px 22px}.hero{padding:35px 24px 85px;min-height:auto}.hero-inner{grid-template-columns:1fr;gap:38px}.hero-illustration{order:-1}.sticker-card{max-width:250px}.art-label{left:18%;top:-20px}.s1{right:20%;top:4%}.s2{left:16%;bottom:12%}h1{font-size:clamp(3rem,12vw,4.5rem);margin:11px 0 20px}.hero-text{font-size:1rem}.no-pressure{margin-left:0}.section{padding:78px 24px}.two-col{grid-template-columns:1fr;gap:24px}.prose{font-size:1.04rem}.note .body{padding:0 22px 22px 22px}.note summary{padding:18px 20px;gap:12px;font-size:1rem}.letter-paper{padding:54px 29px 30px}.letter-paper:before{inset:12px}.letter-paper p{font-size:1rem}.scroll-down{display:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#hear">Skip to the apology</a>
+<div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+<header class="topbar"><a href="#top" class="brand"><b aria-hidden="true">♡</b>a little letter</a><a class="top-link" href="#letter">read the letter ↗</a></header>
+<main>
+<section class="hero" id="top" aria-labelledby="title">
+  <div class="hero-inner">
+    <div class="art-side">
+      <span class="art-label">for you, love.</span>
+      <span class="tiny-star s1" aria-hidden="true">✳</span>
+      <div class="sticker-card">
+        <button type="button" class="sticker-button" id="sticker" aria-label="Send Peach and Goma a tiny heart">
+          <img src="./assets/peach-goma.webp" width="171" height="148" alt="Peach, the white cat, cuddles Goma, the gray cat. A red heart floats above them.">
+          <span class="sticker-heart" aria-hidden="true">♥</span>
+        </button>
+      </div>
+      <span class="tiny-star s2" aria-hidden="true">✳</span>
+      <p class="sticker-caption" id="sticker-caption" aria-live="polite">a tiny note, with Peach &amp; Goma</p>
+    </div>
+    <div class="hero-copy">
+      <span class="eyebrow">something I should have said better</span>
+      <h1 id="title">I should have <em>listened.</em></h1>
+      <p class="hero-text">You were trying to tell me what you needed and how you felt. I responded as though I had to defend myself. I'm sorry for making that harder than it ever should have been.</p>
+      <button type="button" class="envelope-open" id="open-letter" aria-label="Open the apology and continue reading">
+        <span class="env" aria-hidden="true"><span class="env-back"></span><span class="env-sheet">♡</span><span class="env-front"></span><span class="env-flap"></span></span>
+        <span class="label">Open my apology →</span>
+      </button>
+      <p class="no-pressure">Take your time reading. You don't need to answer anything here.</p>
+    </div>
+  </div>
+  <a href="#hear" class="scroll-down">scroll gently ↓</a>
+</section>
+<section class="section" id="hear">
+  <div class="inner two-col">
+    <div><p class="chapter-kicker">01 / the part I got wrong</p><h2>You needed to be <em>heard.</em></h2></div>
+    <div class="prose">
+      <p>When you told me what you wanted from our relationship, you weren't attacking me. You were opening up to me.</p>
+      <p>I let my insecurity and defensiveness take over. I reacted before I really listened, and I turned a conversation about your needs into one about my feelings.</p>
+      <div class="quote"><span aria-hidden="true">♡</span><p>That wasn't fair to you. You shouldn't have to fight to feel understood by the person who loves you.</p></div>
+    </div>
+  </div>
+</section>
+<section class="section tinted" id="understand">
+  <div class="inner">
+    <p class="chapter-kicker center">02 / what I understand now</p>
+    <h2 class="center-heading">I hear the things I made <em>harder.</em></h2>
+    <p class="center-intro">These aren't explanations for my behavior. They're things I need to own.</p>
+    <div class="notes">
+      <details class="note"><summary><span class="n">01</span><strong>You were asking for care, not a debate.</strong><span class="plus" aria-hidden="true">+</span></summary><div class="body">I treated your needs like criticism instead of trying to understand them. That put you in the position of having to defend feelings I should have taken seriously.</div></details>
+      <details class="note"><summary><span class="n">02</span><strong>You have felt alone in the effort.</strong><span class="plus" aria-hidden="true">+</span></summary><div class="body">I've made you feel like you were carrying more of this relationship than you should. I understand how tiring that must be, especially when you were reaching out because you wanted us to work.</div></details>
+      <details class="note"><summary><span class="n">03</span><strong>My insecurity is mine to work on.</strong><span class="plus" aria-hidden="true">+</span></summary><div class="body">Being insecure doesn't make my reactions okay. I can't keep expecting you to manage them or reassure me when you're the one trying to be heard. I have to take responsibility for how I respond.</div></details>
+    </div>
+    <p class="small-note">You can open these notes, or simply keep reading.</p>
+  </div>
+</section>
+<section class="section" id="change">
+  <div class="inner two-col">
+    <div><p class="chapter-kicker">03 / what I need to change</p><h2>More than <em>words.</em></h2><p class="heading-aside">I can't promise I'll get everything right immediately. I can take these steps seriously and keep doing the work when it's uncomfortable.</p></div>
+    <ol class="steps">
+      <li><span class="step-no">01</span><div><h3>Listen before I explain.</h3><p>Let you finish. Ask what you need me to understand instead of assuming I already know.</p></div></li>
+      <li><span class="step-no">02</span><div><h3>Notice when I become defensive.</h3><p>Slow down, own my reaction, and take a short pause if needed—then come back to the conversation.</p></div></li>
+      <li><span class="step-no">03</span><div><h3>Share the effort.</h3><p>Show care and take initiative in ordinary moments, instead of leaving you to carry the emotional work.</p></div></li>
+      <li><span class="step-no">04</span><div><h3>Accept accountability without excuses.</h3><p>When I get something wrong, acknowledge it and make a real adjustment rather than another argument.</p></div></li>
+    </ol>
+  </div>
+</section>
+<section class="section letter-area" id="letter">
+  <div class="inner">
+    <p class="chapter-kicker center">04 / the letter I owe you</p>
+    <h2 class="center-heading">For you, <em>love.</em></h2>
+    <article class="letter-paper" aria-label="My apology letter">
+      <span class="tape left" aria-hidden="true"></span><span class="tape right" aria-hidden="true"></span>
+      <div class="paper-top"><span>a letter, not an excuse</span><b aria-hidden="true">♡</b></div>
+      <p class="salutation">Hey, love,</p>
+      <p>I'm sorry for the way I've made you feel, especially when you were only trying to tell me what you needed from me.</p>
+      <p>Instead of giving you room to be honest, I became defensive and reactive. I made it harder for you to speak openly with me, and I understand how lonely and exhausting that must have felt.</p>
+      <p>You shouldn't have to carry this relationship on your own or keep convincing me that your feelings matter. They do. You do.</p>
+      <p>I know that my insecurity doesn't excuse any of this. It's something I need to work on without making it your responsibility. I want to learn how to really listen, handle difficult conversations with care, and show up for you consistently.</p>
+      <p>I know a little website can't repair the hurt. What matters is what I do after this: the way I listen the next time you need me, the way I respond when things are difficult, and the effort I put in even when nobody is asking.</p>
+      <p>I'm sorry for making you feel like you were alone in something we were supposed to be in together. I love you. I want my actions to feel like love, too.</p>
+      <p>You can take all the time and space you need. You don't owe me forgiveness, a reply, or a happy ending because I made this.</p>
+      <p class="signature">With love,<br><span>me ♡</span></p>
+      <img class="letter-small-sticker" src="./assets/peach-goma.webp" width="171" height="148" alt="" loading="lazy">
+    </article>
+    <p class="after">The end of this page isn't the end of the work I need to do.</p>
+    <a class="again" href="#top">back to the beginning ↑</a>
+  </div>
+</section>
+</main>
+<footer class="footer"><p>made with care, and with a lot to learn ♡</p><p class="credit">Peach &amp; Goma artwork belongs to its original creator. Unofficial personal draft; not affiliated with the artist.</p></footer>
+<script>
+(function(){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const opener = document.getElementById('open-letter');
+  const cat = document.getElementById('sticker');
+  const caption = document.getElementById('sticker-caption');
+  const bar = document.getElementById('progress-bar');
+  function go(){document.getElementById('hear').scrollIntoView({behavior:reduced?'auto':'smooth'});}
+  opener.addEventListener('click',function(){
+    if(!opener.classList.contains('opened')){
+      opener.classList.add('opened');
+      window.setTimeout(go,reduced?0:690);
+    }else{go();}
+  });
+  cat.addEventListener('click',function(){
+    cat.classList.remove('pop'); void cat.offsetWidth; cat.classList.add('pop');
+    caption.textContent='a little love, and a lot of listening ♡';
+  });
+  function progress(){
+    const size=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.transform='scaleX('+Math.max(0,Math.min(1,size?window.scrollY/size:0))+')';
+  }
+  window.addEventListener('scroll',progress,{passive:true});
+  window.addEventListener('resize',progress,{passive:true});
+  progress();
+})();
+</script>
+</body>
+</html>
