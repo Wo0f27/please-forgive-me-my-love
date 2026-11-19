@@ -4,6 +4,19 @@ A cozy Peach and Goma apology website hosted on GitHub Pages.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
+## Version 10 — animated, high-quality Peach and Goma stickers
+
+The six illustration slots in the letter and closing scene now use **six distinct, locally hosted transparent animated WebP files** restored from the source GIFs rather than the first-frame PNG conversions. There are **eight animated placements** in total, including the landing and envelope companion. The original transparent user-provided PNG is retained in the repository as a fallback.
+
+The original static importer in \`tools/vendor_stickers.py\` used \`seek(0)\` and converted each GIF to one still PNG, which explains why nothing moved in earlier releases. The previous image cutout/downscaling also reduced quality. Version 10 preserves each frame at the original image dimensions and uses lossless animated WebP with alpha transparency. Animated WebP is supported by modern Chrome, Brave, Safari and Firefox and avoids the GIF format's color/edge limitations.
+
+- \`assets/stickers/{sad-tears,comfort,back-hug,little-kiss,tender-hug,ending-hug}.webp\`: 6 source animations, 12–20 frames each. The JSON manifest at \`assets/stickers/animations.json\` records original source, dimensions, frame counts, durations and hashes.
+- \`<picture>\` switches to existing **transparent still PNGs** when the visitor enables reduced motion; failed animation requests also have local fallback art.
+- The final **"read it again"** control has been removed. The closing page ends naturally with its existing message and flowers.
+- \`tools/restore_animated_stickers.py\` documents and reproduces the approved frame-preserving conversion if the assets ever need updating.
+
+No remote image hosting is needed at runtime. The original artwork was supplied by the user or linked in earlier versions; the user says they have permission for this public personal project. Native source images are roughly 460–498 pixels wide, so displaying them above that scale will not create new detail, but no deliberate downsampling is performed in this revision.
+
 ## Version 9 — screen-recording fixes (November 20, 2026)
 
 The user supplied a 21.6-second recording showing two physical continuity problems in Version 8: the extracted letter unfolded into a disproportionately large empty rectangle, and the refolded card hung visibly above the pink envelope before it moved into the pocket. The pause between the heart burst and the closing scene also felt long.
@@ -35,7 +48,7 @@ The letter itself is still the real parchment inside the physical envelope. The 
 
 Vertical scrolling is native inside the long parchment; horizontal swipes work between other scenes. Escape remains an accessible way to close without proceeding. The end-heart is the only visible in-letter finishing control.
 
-The local PNG art is packaged under \`assets/\` and does not depend on third-party image hosts at runtime. The user says the rightsholder gave permission for use in this public personal project.
+The site packages animated WebP illustrations and still PNG fallbacks under \`assets/\`, with no third-party image hosts required at runtime. The user says the rightsholder gave permission for use in this public personal project.
 
 ### Reduced motion
 
