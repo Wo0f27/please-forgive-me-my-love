@@ -81,7 +81,7 @@ test("the envelope can fold back without destroying or duplicating the letter", 
   await expect(page.locator("#letter-paper article.parchment")).toHaveCount(1);
   await page.locator("#envelope-cover").click();
   await expect(page.locator("#envelope")).toHaveClass(/is-reading/,{timeout:4500});
-  await expect(page.locator("#letter-paper .letter-hello")).toHaveText("Hey, love,");
+  await expect(page.locator("#letter-paper .letter-hello")).toHaveText("My Love,");
 });
 
 test("mobile layout keeps the letter within the viewport and images have fallbacks", async ({page}) => {
@@ -110,4 +110,28 @@ test("horizontal swipe on intro still navigates without visible arrows", async (
   await page.mouse.move(viewport.width*.86,y,{steps:8});
   await page.mouse.up();
   await expect(page.locator("#beginning")).toHaveClass(/is-current/);
+});
+
+
+test("landing page respects My Love greeting, transparent PNG and restrained copy", async ({page}) => {
+  await page.goto("/");
+  await expect(page.locator("#intro-title")).toHaveText("Hey, My Love.");
+  await expect(page.locator("#beginning .soft-line")).toHaveText("There's something I want you to read.");
+  await expect(page.locator("#beginning p")).toHaveCount(1);
+  const sticker = page.locator(".art-opening");
+  await expect(sticker).toHaveAttribute("src","./assets/peach-goma-transparent.png");
+  await expect(sticker).toHaveJSProperty("complete",true);
+  const alpha = await sticker.evaluate(img=>{
+    const canvas=document.createElement("canvas");
+    canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+    const ctx=canvas.getContext("2d");ctx.drawImage(img,0,0);
+    return ctx.getImageData(0,0,1,1).data[3];
+  });
+  expect(alpha).toBeLessThanOrEqual(1);
+  await expect(page.locator("#start-reading")).toHaveCSS("border-radius","8px");
+  await expect(page.locator("#start-reading")).toHaveAttribute("aria-label","Open the letter");
+  const gradient=await page.locator(".room").evaluate(el=>getComputedStyle(el).backgroundImage);
+  expect(gradient).toContain("radial-gradient");
+  await expect(page.locator("#letter-paper .letter-hello")).toHaveText("My Love,");
+  await page.screenshot({path:test.info().outputPath("v5-landing.png"),fullPage:false});
 });

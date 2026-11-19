@@ -16,10 +16,10 @@ h1,h2,p{margin-top:0}h1,h2{font-weight:400;letter-spacing:-.04em}
 p{line-height:1.7}
 .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;padding:0!important;margin:-1px!important}
 .room{position:fixed;inset:0;overflow:hidden;pointer-events:none;background:
-  radial-gradient(ellipse 58% 49% at 70% 27%,#48515952,transparent 84%),
-  linear-gradient(125deg,#11191f,#182229 55%,#101a21)}
+  radial-gradient(ellipse 56% 57% at 76% 28%,#a65d8263,transparent 78%),
+  linear-gradient(125deg,#11191f,#211c26 55%,#171a24)}
 .room:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#070d1155,transparent 26%,transparent 76%,#080f1429)}
-.lamplight{position:absolute;right:5%;top:10%;width:min(460px,80vw);height:48vh;background:#d6ad7130;filter:blur(94px);border-radius:50%}
+.lamplight{position:absolute;right:4%;top:9%;width:min(490px,80vw);height:51vh;background:#c97a9a34;filter:blur(92px);border-radius:50%}
 .experience{height:100%;height:100dvh;position:relative;overflow:hidden;isolation:isolate;touch-action:pan-y}
 .scene{position:absolute;inset:0;padding:clamp(14px,3vw,36px);overflow:hidden;
   display:grid;place-items:center;opacity:0;visibility:hidden;pointer-events:none;
@@ -34,10 +34,18 @@ p{line-height:1.7}
 .opening h1{font-size:clamp(50px,8vw,81px);margin:4px 0 8px}
 .opening p{font-size:clamp(17px,2.4vw,20px);color:#e0d6cd;max-width:490px;margin:0 0 5px}
 .opening .soft-line{color:var(--warm);font-style:italic;margin-top:8px}
-.opening-link{margin-top:18px;background:none;color:#f0d5b5;border:0;border-bottom:1px solid #9c8472;
-  padding:8px 10px;font:italic 18px Georgia,serif;display:flex;gap:16px;align-items:center}
-.opening-link span{font-size:22px;font-style:normal}
-.opening-link:hover{color:#fff0dc}
+.opening-link{margin-top:20px;display:inline-flex;align-items:center;justify-content:space-between;gap:23px;
+  padding:13px 17px 13px 22px;min-height:52px;border:1px solid #efc6d2;border-radius:8px;
+  background:linear-gradient(145deg,#e9c0cb,#cb94a4);color:#392832;
+  box-shadow:0 9px 28px #0006,inset 0 1px #fff4f0a8;
+  font:600 16px/1.2 Georgia,serif;letter-spacing:.01em;
+  transform:rotate(-1deg);transition:transform .2s ease,box-shadow .2s ease}
+.opening-link .button-text{white-space:nowrap}
+.opening-link .button-seal{width:28px;height:28px;display:grid;place-items:center;flex:none;
+  border-radius:50%;background:#af6c83;color:#fff2f0;border:1px solid #f5d1d8;
+  font:20px/1 Georgia,serif;box-shadow:0 1px 4px #683e4b35}
+.opening-link:hover{transform:translateY(-2px) rotate(0deg);box-shadow:0 12px 32px #0007,inset 0 1px #fff4f0c7}
+.opening-link:active{transform:translateY(0) rotate(0deg)}
 .scene-envelope{padding:0}
 .envelope-stage{position:relative;inset:0;width:100%;height:100%;height:100dvh;overflow:hidden}
 .envelope-heading{position:absolute;top:19%;left:0;right:0;margin:0 auto;text-align:center;
@@ -125,7 +133,7 @@ p{line-height:1.7}
  .art-opening{height:clamp(155px,28vh,230px)}
  .opening h1{font-size:clamp(46px,12vw,69px);margin:2px 0 4px}
  .opening p{font-size:clamp(16px,4.2vw,19px);line-height:1.61}
- .opening-link{margin-top:10px;font-size:17px}
+ .opening-link{margin-top:13px;font-size:16px}
  .envelope-heading{top:19%;font-size:clamp(32px,8vw,45px)}
  .envelope-companion{left:calc(50% + 108px);top:calc(50% - 92px);width:clamp(68px,17vw,102px)}
  .envelope-back,.envelope-pocket,.envelope-flap,.envelope-cover{width:min(277px,78vw)}
