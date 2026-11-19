@@ -1,43 +1,41 @@
 # A little letter for you
 
-A small, cutesy-cozy Peach and Goma apology website, published on GitHub Pages.
+A cozy Peach and Goma apology website hosted on GitHub Pages.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
-## Version 7 — a paper letter that unfolds and returns home
+## Version 8 — a bouquet, falling petals, and a heart-filled ending
 
-The interface is deliberately minimal. There is no header, chapter indicator, visible page arrows, or forced forgiveness interaction. A warm cream-and-blush backdrop replaces Version 6's dark night colors.
+The overall feel remains cutesy and cozy. The opening uses "Hey, My Love." and a simple invitation; no navbar, chapter indicators, big arrows or forgiveness-request buttons are added.
 
-The experience contains three connected scenes:
+The letter itself is still the real parchment inside the physical envelope. The staged sequence is:
 
-1. **Hey, My Love.** A simple greeting and a gentle invitation button.
-2. **The actual letter.** Tap the sealed envelope. Its flap opens and the real parchment rises out **still folded**. Only once it has cleared the pocket does it visibly **unfold** into the long, native-scrollable apology. Near the end are the original three pastel flowers from the Ash garden, blooming on the paper itself.
-3. **A soft ending.** At the very bottom of the parchment, tap the **heart**. The sheet visibly **refolds, slips back into the envelope, and seals**, then the final scene opens. The heart is the only visible in-letter close/continue control. There is no upper-right fold button.
+1. The sealed envelope opens. A compact, **still-folded** piece of paper rises behind the front pocket. Its writing is concealed.
+2. The paper visibly **unfolds around three hinged sections**, then grows into the tall, natively scrollable full letter.
+3. Inside the parchment, the three original Ash garden flower designs are arranged into a **single wrapped bouquet** with gathered stems, pink gift paper and a small ribbon. The leaves and stems are already visible, and the blossoms open shortly after the bouquet comes into view.
+4. The site has **18 gently drifting animated background petals**, positioned behind the text and envelope; these loop with varied durations and negative starts, so the motion doesn't synchronize or appear overly busy.
+5. At the very bottom, the large but visually minimal heart is the final interactive footer. **One tap launches a burst of 48 heart emojis** (12 restrained hearts with reduced-motion enabled). The burst completes *before* the letter refolds.
+6. The folded paper then slides down into the envelope's front pocket at its compact size. The flap closes; only after a short hold does the closing scene appear, with small floral details around Peach and Goma.
 
-Between scenes, the page uses a quiet dissolve and a handful of short-lived floating pastel petals rather than a conventional slider transition. Mobile horizontal swipes work outside the scrollable letter; vertical swipes inside the letter always remain native. Keyboard users can use Escape to return the paper to the envelope without advancing, or use focused navigation controls that remain hidden until tabbed to.
+Vertical scrolling is native inside the long parchment; horizontal swipes work between other scenes. Escape remains an accessible way to close without proceeding. The end-heart is the only visible in-letter finishing control.
 
-Reduced-motion preferences skip the choreography and show the full flower illustration without motion. The substantive apology text, Peach and Goma illustrations and the previous user-approved "My Love" greeting remain intact.
+The local PNG art is packaged under \`assets/\` and does not depend on third-party image hosts at runtime. The user says the rightsholder gave permission for use in this public personal project.
 
-## The flowers from Ash
+### Reduced motion
 
-The three flowers—peach, cream and lavender, with stems and leaves that grow before their petals open—come directly from the SVG and CSS in the user's [For Ash](https://github.com/Wo0f27/for-ash) site. Only the **flower shapes and their growth mechanism** were reused. Ash's personal messages, dark garden backdrop, unrelated celebrations, and story text were not carried into this apology.
+The site observes \`prefers-reduced-motion\`. It turns off looping background petals and avoids prolonged transforms; the bouquet remains visible. The final heart still gets a brief, stationary acknowledgment, without a moving burst.
 
-The For Ash flower mechanism credited inspiration from [FIQTOR](https://github.com/FIQTOR) through its THIRD_PARTY_NOTICES.md. The envelope layering was inspired by [zspxx's animated-envelope](https://github.com/zspxx/animated-envelope) (MIT).
+### Files
 
-## Artwork
+- \`index.html\` — complete letter, Peach/Goma images, original Ash flower paths arranged as a bouquet, ambient petal layer and heart overlay.
+- \`styles.css\` — pastel stationery look, physical hinged folds, looping background petals, bouquet wrapping, heart burst.
+- \`app.js\` — envelope and reading state machine, final burst followed by folding/insertion and closing-scene transition.
+- \`tests/site.spec.cjs\` — Playwright interaction, responsiveness, bouquet, movement and reduced-motion tests.
+- \`.github/workflows/site-qa.yml\` — browser tests before publication.
 
-Peach and Goma characters were created by Bu Jue Xiao Xiao. The user states the creator/rightsholder gave permission for this public personal project. The user-supplied transparent landing PNG and six separately stored still images under \`assets/stickers/\` ship **inside the repository**, so the website does not require image hotlinks. The images were extracted from previously selected Peach and Goma sticker references, then conservatively cut out to preserve the white-cat silhouette.
+The website itself is plain HTML, CSS and JavaScript. There are no external runtime scripts, cookies, analytics, subscriptions or paid APIs.
 
-## Source and testing
-
-- \`index.html\` — full letter, Ash flower SVG, stationery scene structure.
-- \`styles.css\` — cozy blush-and-cream palette, paper stage animation, bloom/petal motion and short-screen layouts.
-- \`app.js\` — seven-stage envelope interaction, native scrolling, end-heart progression, gesture/keyboard support.
-- \`assets/\` — locally stored art.
-- \`tests/site.spec.cjs\` — Playwright tests for mobile and desktop, including short-height and reduced-motion cases.
-- \`.github/workflows/site-qa.yml\` — automated Chromium checks.
-
-Runtime requires no build step, analytics, cookies, paid API, external JavaScript or framework. To run browser checks:
+Run browser tests locally:
 
 \`\`\`sh
 npm install
@@ -45,4 +43,8 @@ npx playwright install chromium
 npm test
 \`\`\`
 
-The repository and site are public. The \`noindex\` tag does not make either private.
+### Credits and privacy
+
+Peach and Goma are characters by Bu Jue Xiao Xiao. The three original SVG flower designs were reused from the user's [For Ash](https://github.com/Wo0f27/for-ash) website. The physical envelope technique was adapted from the same repository, whose source credited the MIT-licensed [animated-envelope](https://github.com/zspxx/animated-envelope) concept. The personal Ash story and messages were not imported.
+
+This repo and its GitHub Pages URL are public. The noindex meta tag asks search engines not to index it; it does not restrict access.

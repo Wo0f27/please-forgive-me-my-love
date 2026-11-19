@@ -1,4 +1,4 @@
-/* A Little Letter — v7
+/* A Little Letter — v8
    One letter with distinct extracting, unfolding, reading, refolding and
    reinserting phases. The final tap finishes the physical letter before
    opening the closing scene. No navigation bar or artificial page breaks. */
@@ -15,6 +15,7 @@
   const paper = document.getElementById("letter-paper");
   const lastHeart = document.getElementById("last-heart");
   const petals = document.getElementById("scene-petals");
+  const heartLayer = document.getElementById("heart-burst");
   const garden = document.querySelector("[data-bloom-scene]");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -26,8 +27,8 @@
   let timers = [];
 
   const durations = {
-    extract: 860, unfold: 650,
-    refold: 640, insert: 610, seal: 730, settle: 650
+    extract: 860, unfold: 690, heartBurst: 1500,
+    refold: 820, insert: 680, seal: 910, finalHold: 280, settle: 650
   };
 
   function schedule(callback, duration) {
@@ -54,7 +55,7 @@
   }
 
   function updateButtons() {
-    const busy = ["extracting","unfolding","refolding","inserting","sealing"].includes(phase);
+    const busy = ["extracting","unfolding","heartburst","refolding","inserting","sealing"].includes(phase);
     previous.disabled = current === 0 || (current === 1 && busy);
     nextButton.disabled = current === 2 || (current === 1 && (
       busy || (phase === "reading" && !readingAtEnd())
@@ -93,18 +94,19 @@
 
   function syncEnvelope() {
     const open = !["closed","sealing"].includes(phase);
-    const reading = phase === "reading";
+    const reading = phase === "reading" || phase === "heartburst";
     envelope.classList.toggle("is-open",open);
-    for (const state of ["extracting","unfolding","reading","refolding","inserting","sealing"]) {
-      envelope.classList.toggle("is-"+state, phase === state);
+    for (const state of ["extracting","unfolding","reading","heartburst","refolding","inserting","sealing"]) {
+      envelope.classList.toggle("is-"+state, state === "reading" ? reading : phase === state);
     }
-    envelopeStage.classList.toggle("is-reading", ["unfolding","reading","refolding"].includes(phase));
+    envelopeStage.classList.toggle("is-reading", ["unfolding","reading","heartburst","refolding"].includes(phase));
     cover.disabled = phase !== "closed";
     cover.setAttribute("aria-expanded",String(open));
     paper.tabIndex = reading ? 0 : -1;
     paper.setAttribute("aria-hidden",String(!reading));
     paper.inert = !reading;
-    lastHeart.disabled = !reading;
+    lastHeart.disabled = phase !== "reading";
+    lastHeart.classList.toggle("is-ready",phase === "reading" && readingAtEnd());
     updateButtons();
     if (reading) maybeBloom();
   }
@@ -134,6 +136,49 @@
     },durations.extract);
   }
 
+
+  function burstHearts() {
+    heartLayer.replaceChildren();
+    const origin = lastHeart.getBoundingClientRect();
+    const x = origin.left + origin.width / 2;
+    const y = origin.top + origin.height / 2;
+    const emojis = ["💗","💕","💖","💞","💘","💓","❤️","💝"];
+    const count = reducedMotion.matches ? 12 : 48;
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) {
+      const heart = document.createElement("span");
+      heart.className = "heart-particle";
+      heart.textContent = emojis[(i*5+i%3) % emojis.length];
+      heart.style.setProperty("--heart-x", x+"px");
+      heart.style.setProperty("--heart-y", y+"px");
+      const angle = (i * 137.508 + 20) * Math.PI / 180;
+      const distance = 80 + (i % 8) * 26;
+      heart.style.setProperty("--heart-dx",Math.round(Math.cos(angle)*distance)+"px");
+      heart.style.setProperty("--heart-dy",Math.round(-65-Math.abs(Math.sin(angle))*distance)+"px");
+      heart.style.setProperty("--heart-delay",reducedMotion.matches?"0ms":(i%11*39)+"ms");
+      heart.style.setProperty("--heart-size",(17+(i*7)%21)+"px");
+      heart.style.setProperty("--heart-end-scale",(0.7+(i%5)*0.15).toFixed(2));
+      heart.style.setProperty("--heart-rotate",((-160+(i*43)%320))+"deg");
+      fragment.appendChild(heart);
+    }
+    heartLayer.appendChild(fragment);
+  }
+
+  function launchHeartFinale() {
+    if (phase !== "reading" || !readingAtEnd()) return;
+    cancelSequence();
+    phase = "heartburst";
+    syncEnvelope();
+    burstHearts();
+    announce("Lots of love for you.");
+    schedule(() => {
+      heartLayer.replaceChildren();
+      phase = "reading";
+      syncEnvelope();
+      closeEnvelope(true);
+    }, durations.heartBurst);
+  }
+
   function closeEnvelope(advanceToEnding = false) {
     if (phase !== "reading") return;
     cancelSequence();
@@ -157,7 +202,8 @@
           syncEnvelope();
           if (advanceToEnding) {
             rememberedScrollTop = 0;
-            go(2);
+            announce("The letter is sealed with love.");
+            schedule(() => go(2),durations.finalHold);
           } else {
             announce("The letter is safely tucked away.");
           }
@@ -170,7 +216,7 @@
     if (current === 0) return go(1);
     if (current === 1) {
       if (phase === "closed") return openEnvelope();
-      if (phase === "reading" && readingAtEnd()) return closeEnvelope(true);
+      if (phase === "reading" && readingAtEnd()) return launchHeartFinale();
     }
   }
 
@@ -187,7 +233,8 @@
     rememberedScrollTop = 0;
     phase = "closed";
     paper.scrollTop = 0;
-    garden.classList.remove("is-blooming");
+    garden.classList.remove("is-blooming","is-grown");
+    heartLayer.replaceChildren();
     syncEnvelope();
     go(0);
   }
@@ -212,15 +259,14 @@
 
   document.getElementById("start-reading").addEventListener("click", () => go(1));
   cover.addEventListener("click",openEnvelope);
-  lastHeart.addEventListener("click",() => {
-    if (phase === "reading" && readingAtEnd()) closeEnvelope(true);
-  });
+  lastHeart.addEventListener("click", launchHeartFinale);
   document.getElementById("again").addEventListener("click",restart);
   previous.addEventListener("click",back);
   nextButton.addEventListener("click",next);
   paper.addEventListener("scroll",() => {
     if (phase === "reading") {
       maybeBloom();
+      lastHeart.classList.toggle("is-ready",readingAtEnd());
       updateButtons();
     }
   },{passive:true});
