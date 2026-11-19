@@ -107,7 +107,7 @@ def remove_connected_background(img: Image.Image, name: str) -> Image.Image:
     print(f"    Preserved {retained} character pixels of {w*h}",flush=True)
     return out
 
-def get_image(url: str) -> Image.Image:
+def get_image(url: str, name: str) -> Image.Image:
     headers={
         "User-Agent":"Mozilla/5.0 (compatible; personal-sticker-archival/1.0)",
         "Accept":"image/avif,image/webp,image/gif,image/png,image/jpeg,*/*",
@@ -120,6 +120,12 @@ def get_image(url: str) -> Image.Image:
         raw=resp.read(9_000_001)
         if len(raw)>9_000_000:
             raise ValueError("Source image exceeds 9 MB cap")
+    # Upload the unmodified originals as a temporary private QA artifact.
+    # This allows checking difficult white-on-white illustrations by eye.
+    original_dir = ROOT / ".source-stickers"
+    original_dir.mkdir(parents=True,exist_ok=True)
+    suffix = Path(url.split("?")[0]).suffix or ".img"
+    (original_dir / (name + suffix)).write_bytes(raw)
     src=Image.open(BytesIO(raw))
     if src.width*src.height>5_000_000:
         raise ValueError("Source image exceeds pixel limit")
@@ -147,7 +153,7 @@ def main():
     for name,url in SOURCES.items():
         dest=ASSETS/(name+".png")
         try:
-            image=optimize(get_image(url),name)
+            image=optimize(get_image(url,name),name)
             image.save(dest,format="PNG",optimize=True)
             print(f"Saved {name}: {image.size}, {dest.stat().st_size:,} bytes",flush=True)
             local=f"./assets/stickers/{name}.png"
