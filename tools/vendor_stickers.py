@@ -28,44 +28,84 @@ SOURCES = {
     "ending-hug": "https://media.tenor.com/0D5fTCGQzZIAAAAe/sending-hugs.png",
 }
 
-def near_white(pixel):
-    r, g, b, a = pixel
-    return a >= 235 and min(r, g, b) >= 230 and max(r,g,b)-min(r,g,b) <= 38
-
-def remove_connected_white_matte(img: Image.Image) -> Image.Image:
-    """Remove only near-white pixels connected to the outer edge, protecting
-    white cats enclosed by darker contours. This is intentionally conservative.
+def remove_connected_background(img: Image.Image, name: str) -> Image.Image:
+    """Use outlined character contours so a white cat is not hollowed out
+    when near-white space is removed. Conservatively preserve existing alpha.
     """
-    w, h = img.size
-    pix = img.load()
-    opaque_corners = [pix[x,y] for x,y in [(0,0),(w-1,0),(0,h-1),(w-1,h-1)]]
-    if sum(near_white(p) for p in opaque_corners) < 2:
+    from PIL import ImageFilter, ImageChops
+
+    w,h = img.size
+    pixels = img.load()
+    corners = [pixels[x,y] for x,y in [(0,0),(w-1,0),(0,h-1),(w-1,h-1)]]
+    opaque = [p for p in corners if p[3]>=220]
+
+    if name=="back-hug":
+        out=img.copy()
+        op=out.load()
+        removed=0
+        for y in range(h):
+            for x in range(w):
+                rr,gg,bb,aa=op[x,y]
+                if aa>0 and gg>rr*1.10 and gg>bb*1.08 and gg>105:
+                    op[x,y]=(rr,gg,bb,0)
+                    removed+=1
+        print(f"    Removed {removed} green backdrop pixels",flush=True)
+        return out
+
+    if img.getchannel("A").getextrema()[0] < 100 and len(opaque)<2:
         return img
-    # If there is already substantial alpha, the art likely has its own cutout.
-    if img.getchannel("A").getextrema()[0] < 210:
+    if len(opaque)<2:
         return img
-    candidates = deque()
-    visited = bytearray(w*h)
-    def add(x,y):
-        idx=y*w+x
-        if not visited[idx] and near_white(pix[x,y]):
-            visited[idx]=1
-            candidates.append((x,y))
-    for x in range(w):
-        add(x,0); add(x,h-1)
+
+    channels = [sorted(p[i] for p in opaque) for i in range(3)]
+    bg = tuple(ch[len(ch)//2] for ch in channels)
+    def difference(color):
+        return sum((color[i]-bg[i])**2 for i in range(3))**0.5
+
+    if sum(difference(p[:3])<45 for p in opaque)<2:
+        return img
+    print(f"    Inferred backdrop RGB {bg}",flush=True)
+    ink=Image.new("L",(w,h),0)
+    ip=ink.load()
+    threshold=42 if max(bg)>200 else 36
     for y in range(h):
-        add(0,y); add(w-1,y)
-    removed=0
-    while candidates:
-        x,y=candidates.popleft()
-        pix[x,y]=(0,0,0,0)
-        removed+=1
-        if x: add(x-1,y)
-        if x+1<w: add(x+1,y)
-        if y: add(x,y-1)
-        if y+1<h: add(x,y+1)
-    print(f"    Matting: {removed} background pixels removed of {w*h}", flush=True)
-    return img
+        for x in range(w):
+            rr,gg,bb,aa=pixels[x,y]
+            if aa>35 and difference((rr,gg,bb))>threshold:
+                ip[x,y]=255
+    edge=ink.filter(ImageFilter.MaxFilter(13)).filter(ImageFilter.MinFilter(13))
+    ep=edge.load()
+    outside=bytearray(w*h)
+    q=deque()
+    def push(x,y):
+        i=y*w+x
+        if not outside[i] and ep[x,y]<128:
+            outside[i]=1
+            q.append((x,y))
+    for x in range(w):
+        push(x,0);push(x,h-1)
+    for y in range(h):
+        push(0,y);push(w-1,y)
+    while q:
+        x,y=q.popleft()
+        if x:push(x-1,y)
+        if x+1<w:push(x+1,y)
+        if y:push(x,y-1)
+        if y+1<h:push(x,y+1)
+    mask=Image.new("L",(w,h),0)
+    mp=mask.load()
+    retained=0
+    for y in range(h):
+        for x in range(w):
+            if not outside[y*w+x]:
+                mp[x,y]=255
+                retained+=1
+    mask=mask.filter(ImageFilter.GaussianBlur(0.5))
+    mask=ImageChops.darker(mask,img.getchannel("A"))
+    out=img.copy()
+    out.putalpha(mask)
+    print(f"    Preserved {retained} character pixels of {w*h}",flush=True)
+    return out
 
 def get_image(url: str) -> Image.Image:
     headers={
@@ -88,8 +128,8 @@ def get_image(url: str) -> Image.Image:
     src.seek(0)
     return ImageOps.exif_transpose(src.convert("RGBA"))
 
-def optimize(img:Image.Image) -> Image.Image:
-    img=remove_connected_white_matte(img)
+def optimize(img:Image.Image, name:str) -> Image.Image:
+    img=remove_connected_background(img,name)
     alpha=img.getchannel("A")
     bbox=alpha.getbbox()
     if bbox:
@@ -107,12 +147,9 @@ def main():
     for name,url in SOURCES.items():
         dest=ASSETS/(name+".png")
         try:
-            if not dest.exists():
-                image=optimize(get_image(url))
-                image.save(dest,format="PNG",optimize=True)
-                print(f"Saved {name}: {image.size}, {dest.stat().st_size:,} bytes",flush=True)
-            else:
-                print(f"Already have {name}",flush=True)
+            image=optimize(get_image(url),name)
+            image.save(dest,format="PNG",optimize=True)
+            print(f"Saved {name}: {image.size}, {dest.stat().st_size:,} bytes",flush=True)
             local=f"./assets/stickers/{name}.png"
             if url in html:
                 html=html.replace(url,local)
