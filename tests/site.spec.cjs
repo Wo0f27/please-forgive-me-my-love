@@ -447,8 +447,9 @@ test("the unrolling letter is compact rather than a giant empty card", async ({p
     const pocket=document.querySelector(".envelope-pocket").getBoundingClientRect();
     return {height:p.height,width:p.width,bottom:p.bottom,pocketTop:pocket.top};
   });
-  expect(geometry.height).toBeLessThanOrEqual(300);
-  expect(geometry.width).toBeLessThanOrEqual(397);
+  expect(geometry.height).toBeLessThanOrEqual(260);
+  expect(geometry.width).toBeLessThanOrEqual(314);
+  expect(geometry.bottom).toBeGreaterThanOrEqual(geometry.pocketTop-10);
   expect(geometry.bottom).toBeLessThanOrEqual(geometry.pocketTop+20);
   await page.screenshot({path:test.info().outputPath("compact-unfolding.png"),fullPage:false});
 });
