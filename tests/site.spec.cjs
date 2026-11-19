@@ -13,7 +13,7 @@ test("the full letter exists only inside the envelope", async ({page}) => {
   await expect(page.locator(".scene")).toHaveCount(3);
   await expect(page.locator(".scene.letter-scene,.site-header,.site-nav,.nav-arrow,.chapter-dots")).toHaveCount(0);
   await expect(page.locator("#sealed #letter-paper article.parchment")).toHaveCount(1);
-  await expect(page.locator("#letter-paper .letter-text > p")).toHaveCount(11);
+  await expect(page.locator("#letter-paper .letter-text > p")).toHaveCount(12);
   await expect(page.locator("img")).toHaveCount(8);
   const sources = await page.locator("img").evaluateAll(els => els.map(el => el.getAttribute("src")));
   expect(new Set(sources).size).toBeGreaterThanOrEqual(4);
