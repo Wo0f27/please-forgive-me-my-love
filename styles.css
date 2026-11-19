@@ -90,7 +90,8 @@ p{line-height:1.7}
   border:0;border-radius:5px 7px 4px 6px;box-shadow:0 14px 46px #0008;outline-offset:4px;
   transition:top .62s var(--ease),width .62s var(--ease),height .62s var(--ease),transform .62s var(--ease)}
 .envelope.is-reading .letter-paper::-webkit-scrollbar{display:none;width:0;height:0}
-.reader-tools{position:sticky;z-index:25;top:0;height:0;display:flex;justify-content:flex-end;pointer-events:none}
+.reader-tools{position:absolute;z-index:30;top:max(25px,calc(env(safe-area-inset-top) + 9px));
+  right:max(27px,calc((100vw - 670px) / 2 + 14px));display:flex;pointer-events:none}
 .tuck-away{width:37px;height:37px;margin:12px 12px 0 0;padding:3px;display:grid;place-items:center;flex:none;
   background:#e8d8c1ed;border:1px solid #a98c7470;border-radius:2px 9px 2px 5px;
   box-shadow:0 2px 8px #4c372029;opacity:0;visibility:hidden;pointer-events:none;
