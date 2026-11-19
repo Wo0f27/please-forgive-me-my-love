@@ -22,6 +22,7 @@ jobs:
         with:
           name: original-peach-goma-reference
           path: .source-stickers/
+          include-hidden-files: true
           retention-days: 1
           if-no-files-found: ignore
       - name: Save fetched artwork in the feature branch
