@@ -1,4 +1,4 @@
-/* A Little Letter — v8
+/* A Little Letter — v9
    One letter with distinct extracting, unfolding, reading, refolding and
    reinserting phases. The final tap finishes the physical letter before
    opening the closing scene. No navigation bar or artificial page breaks. */
@@ -27,8 +27,8 @@
   let timers = [];
 
   const durations = {
-    extract: 860, unfold: 690, heartBurst: 1500,
-    refold: 820, insert: 680, seal: 910, finalHold: 280, settle: 650
+    extract: 710, unfold: 620, heartBurst: 1650,
+    refold: 660, insert: 550, seal: 630, finalHold: 160, settle: 520
   };
 
   function schedule(callback, duration) {
@@ -143,7 +143,7 @@
     const x = origin.left + origin.width / 2;
     const y = origin.top + origin.height / 2;
     const emojis = ["💗","💕","💖","💞","💘","💓","❤️","💝"];
-    const count = reducedMotion.matches ? 12 : 48;
+    const count = reducedMotion.matches ? 12 : 64;
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < count; i++) {
       const heart = document.createElement("span");
@@ -152,11 +152,11 @@
       heart.style.setProperty("--heart-x", x+"px");
       heart.style.setProperty("--heart-y", y+"px");
       const angle = (i * 137.508 + 20) * Math.PI / 180;
-      const distance = 80 + (i % 8) * 26;
+      const distance = 112 + (i % 11) * 23;
       heart.style.setProperty("--heart-dx",Math.round(Math.cos(angle)*distance)+"px");
-      heart.style.setProperty("--heart-dy",Math.round(-65-Math.abs(Math.sin(angle))*distance)+"px");
-      heart.style.setProperty("--heart-delay",reducedMotion.matches?"0ms":(i%11*39)+"ms");
-      heart.style.setProperty("--heart-size",(17+(i*7)%21)+"px");
+      heart.style.setProperty("--heart-dy",Math.round(-82-Math.abs(Math.sin(angle))*distance)+"px");
+      heart.style.setProperty("--heart-delay",reducedMotion.matches?"0ms":(i%13*31)+"ms");
+      heart.style.setProperty("--heart-size",(18+(i*7)%22)+"px");
       heart.style.setProperty("--heart-end-scale",(0.7+(i%5)*0.15).toFixed(2));
       heart.style.setProperty("--heart-rotate",((-160+(i*43)%320))+"deg");
       fragment.appendChild(heart);

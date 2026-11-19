@@ -492,3 +492,81 @@ body{background:#fff1e9;color:var(--text)}
 }
 @keyframes heartFade{0%{opacity:0;transform:translate(-50%,-50%) scale(.8)}
   50%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.05)}}
+
+
+/* Version 9 polish — animation geometry confirmed against the user's
+   21.6-second desktop recording (November 20, 2026).
+   Keep the whole apology in one paper, including the bundle and hearts. */
+
+/* The extracted trifold should finish with its lower edge at the mouth of
+   the envelope. The former 53vh/362px card could overlap the pocket by
+   more than 150px while fully blank. */
+.envelope.is-unfolding .letter-paper{
+  width:min(385px,calc(100% - 32px));
+  height:min(43vh,290px);
+  top:calc(50% - min(43vh,290px) - 8px);
+  transform:translate(-50%,0) scale(1);
+  transition:top .6s var(--ease),width .6s var(--ease),
+    height .6s var(--ease),transform .6s var(--ease);
+}
+/* The sheet continues to its full reading size before its ink fades in.
+   This prevents half-visible 'My Love' and snippets of body text appearing
+   inside a still-resizing sheet. */
+.envelope.is-reading .parchment{
+  opacity:1!important;
+  transition:opacity .28s ease .48s!important;
+}
+.envelope.is-heartburst .parchment{transition:none!important}
+/* Make the folded letter settle against the envelope opening rather than
+   floating 25–40px above it as seen halfway through the closing. */
+.envelope.is-refolding .letter-paper{
+  top:calc(50% - 104px);
+  width:min(265px,78vw);
+  height:115px;
+  z-index:15;
+  overflow:hidden;
+  transition:top .66s var(--ease),width .66s var(--ease),
+    height .66s var(--ease),transform .66s var(--ease);
+}
+.envelope.is-inserting .letter-paper{
+  top:calc(50% - 57px);
+  width:min(265px,78vw);
+  height:112px;
+  z-index:2;
+  overflow:hidden;
+  box-shadow:0 4px 12px #b7788e2d;
+  transition:top .52s var(--ease),width .52s var(--ease),
+    height .52s var(--ease),transform .52s var(--ease);
+}
+.envelope.is-sealing .letter-paper{
+  top:calc(50% - 57px);height:112px;
+  width:min(265px,78vw);z-index:2;
+}
+@media(max-width:720px){
+  .envelope.is-refolding .letter-paper,.envelope.is-inserting .letter-paper,
+  .envelope.is-sealing .letter-paper{width:min(255px,77vw)}
+}
+@media(max-height:700px){
+  /* Deliberately override the old desktop compact-height insertion offset
+     which had moved the sheet far ABOVE the pocket on short screens. */
+  .envelope.is-open.is-inserting .letter-paper{top:calc(50% - 57px)}
+  .envelope.is-open.is-unfolding .letter-paper{
+    top:calc(50% - min(43vh,290px) - 8px)}
+}
+/* Make the stationery imagery legible without cluttering the reading area. */
+.paper-garden{width:min(100%,395px);margin:22px auto 19px}
+@media(max-width:720px){.paper-garden{width:min(100%,330px)}}
+.ambient-petals i{width:13px;height:18px;filter:drop-shadow(0 1px 2px #a36c7b30)}
+@keyframes ambientPetalFall{
+  0%{opacity:0;transform:translate3d(0,-8vh,0) rotate(-35deg) scale(var(--petal-scale))}
+  10%{opacity:.68}
+  78%{opacity:.61}
+  100%{opacity:0;transform:translate3d(var(--petal-drift),116vh,0) rotate(580deg) scale(var(--petal-scale))}
+}
+/* Wider, staggered heart flurry. Every particle still disappears before
+   the physical refolding starts, and the closing scene remains text-first. */
+.heart-particle{animation-duration:1.21s}
+@media(prefers-reduced-motion:reduce){
+  .ambient-petals i{animation:none!important;opacity:0!important}
+  .envelope.is-reading .parchment{transition:none!important}
+}
