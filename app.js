@@ -27,8 +27,8 @@
   let timers = [];
 
   const durations = {
-    extract: 710, unfold: 620, heartBurst: 1650,
-    refold: 660, insert: 550, seal: 630, finalHold: 160, settle: 520
+    extract: 710, unfold: 620, expand: 640, heartBurst: 1650,
+    refold: 660, insert: 550, seal: 630, finalHold: 160, settle: 80
   };
 
   function schedule(callback, duration) {
@@ -55,7 +55,7 @@
   }
 
   function updateButtons() {
-    const busy = ["extracting","unfolding","heartburst","refolding","inserting","sealing"].includes(phase);
+    const busy = ["extracting","unfolding","expanding","heartburst","refolding","inserting","sealing"].includes(phase);
     previous.disabled = current === 0 || (current === 1 && busy);
     nextButton.disabled = current === 2 || (current === 1 && (
       busy || (phase === "reading" && !readingAtEnd())
@@ -97,10 +97,10 @@
     const open = !["closed","sealing"].includes(phase);
     const reading = phase === "reading" || phase === "heartburst";
     envelope.classList.toggle("is-open",open);
-    for (const state of ["extracting","unfolding","reading","heartburst","refolding","inserting","sealing"]) {
+    for (const state of ["extracting","unfolding","expanding","reading","heartburst","refolding","inserting","sealing"]) {
       envelope.classList.toggle("is-"+state, state === "reading" ? reading : phase === state);
     }
-    envelopeStage.classList.toggle("is-reading", ["unfolding","reading","heartburst","refolding","inserting","sealing"].includes(phase));
+    envelopeStage.classList.toggle("is-reading", ["unfolding","expanding","reading","heartburst","refolding","inserting","sealing"].includes(phase));
     cover.disabled = phase !== "closed";
     cover.setAttribute("aria-expanded",String(open));
     paper.tabIndex = reading ? 0 : -1;
@@ -123,16 +123,24 @@
       syncEnvelope();
       announce("The paper is unfolding.");
       schedule(() => {
-        phase = "reading";
+        // Hold a noninteractive, unfolded face while the sheet grows into
+        // the final reading viewport. On mobile this eliminates the race
+        // where "reading" started before its scroll container had a height.
+        phase = "expanding";
         syncEnvelope();
-        announce("Your letter is ready to read.");
+        announce("The paper is opening fully.");
         schedule(() => {
-          if (phase === "reading") {
-            paper.scrollTop = Math.max(0,Math.min(rememberedScrollTop,paper.scrollHeight-paper.clientHeight));
-            maybeBloom();
-            updateButtons();
-          }
-        },durations.settle);
+          phase = "reading";
+          syncEnvelope();
+          announce("Your letter is ready to read.");
+          schedule(() => {
+            if (phase === "reading") {
+              paper.scrollTop = Math.max(0,Math.min(rememberedScrollTop,paper.scrollHeight-paper.clientHeight));
+              maybeBloom();
+              updateButtons();
+            }
+          },durations.settle);
+        },durations.expand);
       },durations.unfold);
     },durations.extract);
   }

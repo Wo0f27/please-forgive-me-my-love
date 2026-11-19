@@ -521,3 +521,27 @@ test("the envelope greeting never bleeds into the closing scene", async ({page})
   await expect(page.locator("#sealed")).toHaveClass(/is-current/);
   await expect(page.locator(".envelope-stage")).not.toHaveClass(/is-finishing/);
 });
+
+
+test("reading state begins only after mobile parchment finishes expanding", async ({page}) => {
+  await page.setViewportSize({width:390,height:640});
+  await page.goto("/");
+  await page.locator("#start-reading").click();
+  await page.locator("#envelope-cover").click();
+  const env=page.locator("#envelope");
+  const paper=page.locator("#letter-paper");
+  await expect(env).toHaveClass(/is-unfolding/);
+  await expect(env).toHaveClass(/is-expanding/,{timeout:3100});
+  await expect(paper).toHaveAttribute("aria-hidden","true");
+  await expect(env).toHaveClass(/is-reading/,{timeout:2500});
+  const m=await paper.evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    return {height:r.height,viewport:window.innerHeight,scroll:el.scrollHeight,
+      view:el.clientHeight,overflow:getComputedStyle(el).overflowY};
+  });
+  expect(m.height).toBeGreaterThan(m.viewport*.68);
+  expect(m.scroll).toBeGreaterThan(m.view+300);
+  expect(m.overflow).toBe("auto");
+  await paper.evaluate(el=>{el.scrollTop=Math.round(el.scrollHeight*.4)});
+  expect(await paper.evaluate(el=>el.scrollTop)).toBeGreaterThan(100);
+});
