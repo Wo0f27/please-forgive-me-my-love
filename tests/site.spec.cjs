@@ -600,34 +600,24 @@ test("all eight visible stickers use full-resolution local animated WebP with st
   }
 });
 
-test("restored GIF-based artwork visibly animates rather than freezing on its first frame", async ({page}) => {
+test("restored GIF-based artwork visibly animates in rendered screenshots", async ({page}) => {
   await openTheActualLetter(page);
+  // Drawing an animated image to canvas returns the first frame in some
+  // Chromium versions. The real browser rendering is the correct test.
+  await page.addStyleTag({content:
+    ".ambient-petals,.scene-petals{visibility:hidden!important}"+
+    ".letter-illustration img{filter:none!important}"});
   for(const name of ["sad-tears","little-kiss"]){
     const img=page.locator('img[src$="/'+name+'.webp"]');
     await img.scrollIntoViewIfNeeded();
-    const change=await img.evaluate(async el=>{
-      await el.decode();
-      const canvas=document.createElement("canvas");
-      canvas.width=112;canvas.height=112;
-      const ctx=canvas.getContext("2d",{willReadFrequently:true});
-      const sample=()=>{
-        ctx.clearRect(0,0,112,112);
-        ctx.drawImage(el,0,0,112,112);
-        return new Uint8Array(ctx.getImageData(0,0,112,112).data);
-      };
-      const a=sample();
-      await new Promise(r=>setTimeout(r,670));
-      const b=sample();
-      await new Promise(r=>setTimeout(r,540));
-      const c=sample();
-      let sum=0;
-      for(let i=0;i<a.length;i+=4){
-        sum+=Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])
-          +Math.abs(a[i+2]-b[i+2])+Math.abs(b[i]-c[i]);
-      }
-      return sum;
-    });
-    expect(change,name+" should contain motion").toBeGreaterThan(2500);
+    await expect.poll(()=>img.evaluate(el=>el.naturalWidth)).toBeGreaterThan(450);
+    const screenshots=[];
+    for(let i=0;i<4;i++){
+      screenshots.push((await img.screenshot()).toString("base64"));
+      await page.waitForTimeout(390);
+    }
+    const unique=new Set(screenshots);
+    expect(unique.size,name+" should visibly change poses").toBeGreaterThan(1);
   }
 });
 
