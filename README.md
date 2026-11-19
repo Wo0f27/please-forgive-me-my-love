@@ -1,48 +1,46 @@
 # A little letter for you
 
-An intimate, mobile-first Peach and Goma apology site hosted on GitHub Pages.
+A dark, cozy Peach and Goma apology website. This is a small personal site, not a frontend framework demo.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
-## Version 4 — the letter really comes out of the envelope
+## Reading the letter
 
-The previous version opened a short preview note and placed the real letter on a later scene. This version fixes that by making **the envelope’s paper itself the complete letter**:
+Open the envelope to reveal the actual full apology. The paper lifts from the envelope pocket and expands into a single, vertically scrollable parchment. There is no separate preview letter, artificial page break, or secondary long-letter scene.
 
-1. Open a quiet introduction and continue to the sealed envelope.
-2. Tap the envelope. Its flap opens; a small part of the actual paper rises behind the envelope pocket.
-3. The **same DOM element** expands into a tall, full-height parchment. It is natively scrollable and contains the complete apology, illustrations, and final sign-off. There is no separate letter page, preview message, or repeated letter.
-4. At the true end of the parchment, a small heart leads to the closing message.
+- The fold-shaped corner at the top-right of the paper closes the letter, even on mobile.
+- Closing the letter remembers your reading position, which is restored after opening it again.
+- The reader uses native scrolling, but the scrollbar is visually hidden to reduce the sense of a web panel. A softly curled top and actual ragged paper end give it a continuous stationery appearance.
+- On short desktop browser windows and small mobile viewports, the fully open letter stays within the viewport. It does not inherit the compact positioning used only by the opening animation.
+- Swipe between the opening and the envelope. Vertical scrolling inside the letter does not change scenes; at the end, a little heart opens the final message.
+- Keyboard users can press Escape to close the letter and use focus-revealed navigation controls. Reduced-motion preferences are respected for site transitions.
 
-There are only three scenes, no fixed header, navbar, chapter numbering, or visible arrow buttons. Swipe to change scenes when not reading; **vertical swipes inside the parchment stay native** and horizontal swipes cannot accidentally skip the letter before the end. Escape folds the letter back. Keyboard-only reading controls become visible when focused.
+## Artwork
 
-### Peach and Goma art
+Peach and Goma are created by Bu Jue Xiao Xiao. The user has reported explicit permission to use the artwork on this personal public website.
 
-Version 4 contains **eight image placements with eight distinct sources**: the user's existing locally hosted illustration, a companion sticker beside the envelope, five illustrations throughout the parchment, and an ending illustration.
+The landing and the envelope companion use the same **locally hosted transparent PNG**, from the image supplied by the user. Other illustrations originate from the seven Tenor image references in earlier versions.
 
-All new illustration links are to real Peach and Goma character stickers returned by online image search. The externally hosted URLs are:
+For durability, the one-time \`tools/vendor_stickers.py\` utility can download six of those references to \`assets/stickers/\`, convert animated files to still images (to respect quiet reading and reduced motion), and remove only *border-connected near-white matte areas*. It keeps the original subjects; it does not generate new drawings. The utility changes image paths in \`index.html\` only when an image has been saved successfully.
 
-- https://media.tenor.com/R5hcw0c8l_sAAAAe/peachcat-peachcat-and-goma.png
-- https://media.tenor.com/7Qz2iamu4egAAAAi/peach-goma-sad-tears.gif
-- https://media.tenor.com/Ca7voVE7eoUAAAAC/peachcat-peachcat-and-goma.gif
-- https://media1.tenor.com/m/SnuIjjNClm4AAAAC/peach-goma.gif
-- https://media.tenor.com/qSGlyWc8uv8AAAAi/peach-goma-kiss-peach-and-goma.gif
-- https://media.tenor.com/zBljNGMfvlAAAAAe/couple-tear.png
-- https://media.tenor.com/0D5fTCGQzZIAAAAe/sending-hugs.png
+If an external image could not be vendored, its original URL remains and the existing local transparent illustration is used as a fallback. Static assets are preferable to a third-party image hotlink for long-term reliability.
 
-**Reliability note:** Tenor hosts these assets externally; we have not incorporated them as permanent files in the repository. Each has an error fallback to \`assets/peach-goma.webp\`, the user-supplied picture. If Tenor blocks or removes an image, that illustration will be replaced by the local fallback, potentially reducing visible variety. Images are credited to Bu Jue Xiao Xiao, creator of Peach and Goma. The user has stated that they received permission to use the characters and art on this personal public site. Official creator: https://blog.peachandgoma.com/p/about.html.
+The site is unofficial and makes no claim of endorsement by the creator.
 
-### Implementation
+## Editing and testing
 
-- \`index.html\`: exact letter text, physical envelope, inline art and closing.
-- \`styles.css\`: cozy nighttime styling, envelope layers and one long scrollable parchment.
-- \`app.js\`: envelope stage transitions, scene navigation, input handling, accessibility and image fallbacks.
-- \`assets/peach-goma.webp\`: locally stored user-supplied illustration.
-- \`tests/site.spec.cjs\`: Playwright interaction and desktop/mobile layout tests.
-- \`.github/workflows/site-qa.yml\`: runs browser tests on PRs and main-branch changes.
+The runtime uses plain HTML, CSS and JavaScript:
 
-No framework, third-party JavaScript, tracking, cookies, network API or subscription is needed to run the site. Only the new illustrations currently use third-party hosting.
+- \`index.html\` — actual letter, visuals and the three scene sections.
+- \`styles.css\` — dark rose nighttime room, envelope layers, responsive parchment.
+- \`app.js\` — opening/folding, saved reading position, scrolling, swipes and keyboard handling.
+- \`assets/\` — locally stored, user-authorized images.
+- \`tests/site.spec.cjs\` — Playwright browser checks including 390×640, 360×600, 1280×614 and landscape 844×390.
+- \`.github/workflows/site-qa.yml\` — GitHub-hosted browser QA on pull requests and main branch.
 
-Run checks locally:
+No client-side framework, external scripts, cookies, analytics or paid API is needed.
+
+To test locally:
 
 \`\`\`sh
 npm install
@@ -50,6 +48,6 @@ npx playwright install chromium
 npm test
 \`\`\`
 
-### Credit and privacy
+The envelope construction adapts the user's For Ash website and the MIT-licensed idea from https://github.com/zspxx/animated-envelope.
 
-The envelope mechanism is adapted from the user's For Ash website, which used the MIT-licensed [zspxx animated-envelope layering approach](https://github.com/zspxx/animated-envelope). Character art belongs to its creator and rightsholders. This is an unofficial, non-commercial personal website. The repository and the Pages site are public; the noindex tag does not make them private.
+**Privacy:** The repository and GitHub Pages site are public. The \`noindex\` tag is not authentication or access control.

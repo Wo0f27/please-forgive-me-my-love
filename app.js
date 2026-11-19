@@ -12,10 +12,13 @@
   const cover = document.getElementById("envelope-cover");
   const paper = document.getElementById("letter-paper");
   const lastHeart = document.getElementById("last-heart");
+  const tuckAway = document.getElementById("tuck-away");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let current = 0;
   let envelopePhase = "closed"; // closed, opening, reading, folding
   let envelopeTimer = null;
+  let restoreTimer = null;
+  let rememberedScrollTop = 0;
   let swipeStart = null;
 
   function announce(message) {
@@ -66,6 +69,7 @@
     paper.tabIndex = reading ? 0 : -1;
     paper.setAttribute("aria-hidden", String(!reading));
     paper.inert = !reading;
+    tuckAway.disabled = !reading;
     updateButtons();
   }
 
@@ -78,13 +82,19 @@
       if (envelopePhase !== "opening") return;
       envelopePhase = "reading";
       syncEnvelope();
-      announce("The complete letter is open. Scroll through the parchment to read it.");
+      clearTimeout(restoreTimer);
+      restoreTimer = setTimeout(() => {
+        if (envelopePhase === "reading") paper.scrollTop = Math.min(rememberedScrollTop, paper.scrollHeight - paper.clientHeight);
+      }, reducedMotion.matches ? 0 : 690);
+      announce("The complete letter is open. Scroll to read. Folded corner closes the letter.");
     }, reducedMotion.matches ? 0 : 990);
   }
 
   function closeEnvelope() {
     if (envelopePhase !== "reading") return;
     clearTimeout(envelopeTimer);
+    clearTimeout(restoreTimer);
+    rememberedScrollTop = paper.scrollTop;
     paper.scrollTop = 0;
     envelopePhase = "folding";
     syncEnvelope();
@@ -115,6 +125,8 @@
 
   function restart() {
     clearTimeout(envelopeTimer);
+    clearTimeout(restoreTimer);
+    rememberedScrollTop = 0;
     envelopePhase = "closed";
     paper.scrollTop = 0;
     syncEnvelope();
@@ -123,6 +135,7 @@
 
   document.getElementById("start-reading").addEventListener("click", () => go(1));
   cover.addEventListener("click", openEnvelope);
+  tuckAway.addEventListener("click", closeEnvelope);
   lastHeart.addEventListener("click", () => {
     if (envelopePhase === "reading") go(2);
   });

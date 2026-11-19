@@ -135,3 +135,65 @@ test("landing page respects My Love greeting, transparent PNG and restrained cop
   await expect(page.locator("#letter-paper .letter-hello")).toHaveText("My Love,");
   await page.screenshot({path:test.info().outputPath("v5-landing.png"),fullPage:false});
 });
+
+
+test("short browser and phone viewports keep the entire reading window inside the screen", async ({page}) => {
+  await openTheActualLetter(page);
+  for (const size of [
+    {width:1280,height:614},
+    {width:390,height:640},
+    {width:360,height:600},
+    {width:844,height:390}
+  ]) {
+    await page.setViewportSize(size);
+    const metrics=await page.locator("#letter-paper").evaluate(el => {
+      const r=el.getBoundingClientRect();
+      return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,scroll:el.scrollHeight,view:el.clientHeight};
+    });
+    expect(metrics.top, JSON.stringify(size)).toBeGreaterThanOrEqual(-1);
+    expect(metrics.bottom,JSON.stringify(size)).toBeLessThanOrEqual(size.height+1);
+    expect(metrics.left,JSON.stringify(size)).toBeGreaterThanOrEqual(-1);
+    expect(metrics.right,JSON.stringify(size)).toBeLessThanOrEqual(size.width+1);
+    expect(metrics.scroll).toBeGreaterThan(metrics.view);
+  }
+  await page.screenshot({path:test.info().outputPath("short-screen.png"),fullPage:false});
+});
+
+test("tucked-corner control closes the parchment and reopening resumes reading position", async ({page}) => {
+  await openTheActualLetter(page);
+  const paper=page.locator("#letter-paper");
+  const tuck=page.locator("#tuck-away");
+  await expect(tuck).toBeVisible();
+  await expect(tuck).toBeEnabled();
+  await paper.evaluate(el=>{el.scrollTop=Math.floor(el.scrollHeight*.48);el.dispatchEvent(new Event("scroll"));});
+  const before=await paper.evaluate(el=>el.scrollTop);
+  expect(before).toBeGreaterThan(100);
+  await tuck.click();
+  await expect(page.locator("#envelope")).not.toHaveClass(/is-open/,{timeout:4500});
+  await expect(tuck).toBeDisabled();
+  await page.locator("#envelope-cover").click();
+  await expect(page.locator("#envelope")).toHaveClass(/is-reading/,{timeout:4500});
+  await expect.poll(()=>paper.evaluate(el=>el.scrollTop),{timeout:5000}).toBeGreaterThan(before-75);
+  await expect(page.locator("#sealed")).toHaveClass(/is-current/);
+});
+
+test("the envelope companion is a locally stored transparent sticker", async ({page}) => {
+  await page.goto("/");
+  await page.locator("#start-reading").click();
+  const img=page.locator(".envelope-companion");
+  await expect(img).toHaveAttribute("src","./assets/peach-goma-transparent.png");
+  await expect.poll(()=>img.evaluate(el=>el.naturalWidth)).toBeGreaterThan(0);
+});
+
+test("scrollbars are visually hidden while native reading scroll remains enabled", async ({page}) => {
+  await openTheActualLetter(page);
+  const metrics=await page.locator("#letter-paper").evaluate(el=>({
+    overflow:getComputedStyle(el).overflowY,
+    scrollbar:getComputedStyle(el).scrollbarWidth,
+    scroll:el.scrollHeight,
+    view:el.clientHeight
+  }));
+  expect(metrics.overflow).toBe("auto");
+  expect(metrics.scroll).toBeGreaterThan(metrics.view);
+  expect(metrics.scrollbar).toBe("none");
+});

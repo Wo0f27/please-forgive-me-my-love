@@ -86,11 +86,27 @@ p{line-height:1.7}
   width:min(670px,calc(100% - 28px));
   height:calc(100% - max(32px,env(safe-area-inset-top) + 16px) - env(safe-area-inset-bottom));
   transform:translate(-50%,0) scale(1);z-index:15;overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#b9a58d #efe1ca;
-  box-shadow:0 20px 58px #000b;outline-offset:4px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;scrollbar-color:transparent transparent;
+  border:0;border-radius:5px 7px 4px 6px;box-shadow:0 14px 46px #0008;outline-offset:4px;
   transition:top .62s var(--ease),width .62s var(--ease),height .62s var(--ease),transform .62s var(--ease)}
+.envelope.is-reading .letter-paper::-webkit-scrollbar{display:none;width:0;height:0}
+.reader-tools{position:sticky;z-index:25;top:0;height:0;display:flex;justify-content:flex-end;pointer-events:none}
+.tuck-away{width:37px;height:37px;margin:12px 12px 0 0;padding:3px;display:grid;place-items:center;flex:none;
+  background:#e8d8c1ed;border:1px solid #a98c7470;border-radius:2px 9px 2px 5px;
+  box-shadow:0 2px 8px #4c372029;opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .22s ease,background .22s ease}
+.tuck-away:hover{background:#f5e7d5}
+.fold-corner{position:relative;width:21px;height:20px;border:1px solid #836954;border-radius:1px;
+  background:linear-gradient(137deg,#f5e5d1 74%,#d1b79b 75%);clip-path:polygon(0 0,72% 0,100% 29%,100% 100%,0 100%)}
+.fold-corner:after{content:"";position:absolute;top:0;right:0;height:6px;width:6px;
+  border-left:1px solid #836954;border-bottom:1px solid #836954;background:#d4b99d}
+.envelope.is-reading .tuck-away{opacity:.9;visibility:visible;pointer-events:auto}
 .envelope.is-reading .envelope-cover{pointer-events:none}
 .envelope.is-reading .envelope-flap{z-index:1}
+.envelope.is-reading .parchment-top{border-radius:44% 56% 3px 3px/65% 50% 3px 3px;box-shadow:0 6px 12px #a88b7345}
+.envelope.is-reading .parchment{background:
+  repeating-linear-gradient(0deg,transparent 0 34px,#8c6d4f0b 35px,transparent 36px),
+  linear-gradient(91deg,#dac4a8 0%,#f2e8d8 4%,#f4e9d7 49%,#e8d5b9 96%,#cdb492 100%)}
 .envelope:not(.is-open) .envelope-flap{transition:transform .52s ease .22s,z-index 0s linear .75s}
 .envelope:not(.is-open) .envelope-wax{transition:opacity .18s ease .66s}
 .envelope:not(.is-open) .letter-paper{transition:top .66s var(--ease),width .6s var(--ease),height .6s var(--ease),
@@ -156,7 +172,7 @@ p{line-height:1.7}
  .envelope-flap{height:89px}
  .envelope-wax{top:calc(50% + 40px)}
  .envelope-companion{top:calc(50% - 104px)}
- .envelope.is-open .letter-paper{top:calc(50% - 148px)}
+ .envelope.is-open:not(.is-reading) .letter-paper{top:calc(50% - 148px)}
  .ending{gap:9px}
  .art-ending{max-height:24vh}
  .ending h2{font-size:clamp(40px,7vw,53px)}
