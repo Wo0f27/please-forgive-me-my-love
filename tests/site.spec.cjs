@@ -608,7 +608,7 @@ test("restored GIF-based artwork visibly animates in rendered screenshots", asyn
     ".ambient-petals,.scene-petals{visibility:hidden!important}"+
     ".letter-illustration img{filter:none!important}"});
   for(const name of ["sad-tears","little-kiss"]){
-    const img=page.locator('img[src$="/'+name+'.webp"]');
+    const img=page.locator('#letter-paper img[src$="/'+name+'.webp"]');
     await img.scrollIntoViewIfNeeded();
     await expect.poll(()=>img.evaluate(el=>el.naturalWidth)).toBeGreaterThan(450);
     const screenshots=[];
