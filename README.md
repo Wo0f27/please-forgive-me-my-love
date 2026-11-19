@@ -1,49 +1,45 @@
-# I Should Have Listened — Cozy Night Edition (Version 2)
+# A little letter for you
 
-A small, dark-but-cozy, interactive apology experience featuring Peach and Goma.
+A quiet, responsive Peach and Goma apology experience, hosted on GitHub Pages.
 
-**Live (after deployment):** https://wo0f27.github.io/please-forgive-me-my-love/
+**Site:** https://wo0f27.github.io/please-forgive-me-my-love/
 
-## Version 2 changes
+## Version 3 design
 
-The previous vertically scrolling cream-colored site has been replaced with **six full-screen scenes**:
+Unlike Version 2, there is no header, navigation bar, arrow buttons, chapter numbering, progress dots, or imposed pagination.
 
-1. Hey, love — a soft nighttime introduction
-2. A little letter — physical envelope animation
-3. You deserved to be heard — what went wrong
-4. What I understand / What I'll work on — three paired notes
-5. From me, to you — the full apology, paginated into **four paper pages**
-6. With all my love — a calm closing, without any request for forgiveness
+- Swipe horizontally between six moments; desktop keyboard Left/Right arrows work too. Keyboard-accessible previous/next controls appear only on focus.
+- The envelope opens in two physical stages, adapted from the user's [For Ash](https://github.com/Wo0f27/for-ash) website. Tap the extracted paper to fold it back.
+- **The letter is one continuous scrollable parchment** with a visible torn-paper ending. Vertical swipes on the parchment scroll it rather than navigating away.
+- A small heart at the parchment's end opens the closing scene. Nothing asks for forgiveness or forces a reply.
+- The rest of the site is deliberately restrained: dark cozy surroundings, warm paper, minimal interface text and no gratuitous animations.
+- Reduced-motion support, focus indicators, semantic sections and responsive layout.
 
-The experience uses buttons, left/right arrow keys, or horizontal swipes. The main page never scrolls; even the longer letter uses page transitions rather than a nested scrollbar. The site respects reduced-motion preferences and works without JavaScript frameworks, external fonts, backend services, audio, tracking or cookies.
+## Art
 
-### Envelope behavior
+- \`assets/peach-goma.webp\`: user-supplied Peach and Goma artwork, stored locally.
+- Two additional Peach and Goma illustrations are linked from Tenor and used only in reflection, letter and closing scenes. Their **image sources** are:
+  - https://media.tenor.com/0D5fTCGQzZIAAAAe/sending-hugs.png
+  - https://media.tenor.com/zBljNGMfvlAAAAAe/couple-tear.png
 
-The envelope is based on the layered construction in the user-owned [For Ash](https://github.com/Wo0f27/for-ash) birthday website.
+These are images of characters created by **Bu Jue Xiao Xiao**; they are **not verified as official creator-hosted uploads**. The user reports permission to use these characters on this public personal site. The external sources can change or go offline. If an image fails to load, the site falls back to the local user-supplied asset. Official artist resources: https://blog.peachandgoma.com/p/about.html and https://t.me/peachandgoma.
 
-- The flap opens first.
-- A folded sheet rises from **behind the front pocket**.
-- Once it has cleared the pocket, the paper expands over the envelope.
-- Tap the paper to fold it and tuck it away again, or choose **Read what I need to say** to continue.
+## Development
 
-The For Ash envelope mechanism was itself inspired by [zspxx/animated-envelope](https://github.com/zspxx/animated-envelope) (MIT), crediting [Josh Nichols' CSS envelope](https://codepen.io/MrBlank/pen/JjXxovL). The envelope interaction, scene navigation and styling here are adapted for this separate personal project.
+Runtime is plain \`index.html\`, \`styles.css\` and \`app.js\`. No CDN frameworks, build system, cookies or analytics are required.
 
-## Editing
+A separate, **development-only** test suite runs browser interaction checks using Playwright. To test locally with Node.js:
 
-- \`index.html\`: scene markup and visible short copy.
-- \`styles.css\`: midnight-blue night theme, warm rose and amber accents, responsive layouts.
-- \`app.js\`: scene and navigation state, three combined realization/commitment notes, paginated letter, envelope sequence. Update the \`acknowledgments\` and \`pages\` arrays to personalize the writing.
-- \`assets/peach-goma.webp\`: illustration originally supplied by the user in this ChatGPT conversation.
-- \`.nojekyll\`: prevents Jekyll processing on GitHub Pages.
+\`\`\`sh
+npm install
+npx playwright install chromium
+npm test
+\`\`\`
 
-Open \`index.html\` locally or serve the repository with a simple HTTP server for testing. There is no build step.
+The \`Site browser QA\` GitHub Actions workflow tests desktop and mobile-sized Chromium viewports, the envelope, swipe behavior, and native parchment scrolling before publishing revisions.
 
-## Privacy and permissions
+## Credit
 
-This is a **public** GitHub repository and a public Pages site. A noindex meta tag is not access control. Do not publish private messages, names, screenshots or other sensitive details without consent.
+Envelope layering developed from the user's For Ash repository, which used the MIT-licensed concept in https://github.com/zspxx/animated-envelope. Third-party characters and images remain credited to their respective artists. This is an unofficial, non-commercial personal website.
 
-**Peach and Goma characters and illustration remain the property of their creator/rightsholders.** The included user-supplied image is not covered by a software license and is an unofficial placeholder for personal review. Obtain permission for publicly hosting/redistributing this image or replace it with art you are authorized to publish. No endorsement by the creator is implied.
-
-## Tone
-
-The recipient is free to leave at any time. There are no "forgive me" / "stay with me" buttons, countdowns, trackers, demands for a reply or mandatory interactions. The website does not substitute for a real conversation and meaningful, sustained changes in behavior.
+This repository is public. \`noindex\` requests that search engines not index the site; it **does not** make it private.
