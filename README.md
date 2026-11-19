@@ -4,6 +4,22 @@ A cozy Peach and Goma apology website hosted on GitHub Pages.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
+## Version 9 — screen-recording fixes (November 20, 2026)
+
+The user supplied a 21.6-second recording showing two physical continuity problems in Version 8: the extracted letter unfolded into a disproportionately large empty rectangle, and the refolded card hung visibly above the pink envelope before it moved into the pocket. The pause between the heart burst and the closing scene also felt long.
+
+This revision keeps the existing approved content and design, including all Peach and Goma stickers and the tied Ash bouquet, while making these targeted changes:
+
+- The extracting trifold is now limited to about 290px tall at desktop scale and aligned at the envelope mouth, rather than becoming a 362px floating blank rectangle.
+- The full letter's writing fades in only after the reading paper has nearly reached its final size.
+- Refolding ends directly at the envelope opening; insertion then slides the compact sheet behind the front pocket, without a visible vertical gap.
+- The physical animation timings have been shortened and coordinated, removing the dead pause before the closing page.
+- The final heart now releases **64** varied heart emojis across a wider area before folding begins (12 subdued hearts with reduced motion).
+- Ambient petals are slightly easier to see, and the wrapped bouquet has been enlarged modestly.
+- Additional Playwright tests capture the unfolding geometry, refolding alignment and wider heart burst on both mobile and desktop.
+
+The long apology, the single scrollable parchment, pink stationery theme, flower artwork, ending message and no-navbar gesture design are unchanged.
+
 ## Version 8 — a bouquet, falling petals, and a heart-filled ending
 
 The overall feel remains cutesy and cozy. The opening uses "Hey, My Love." and a simple invitation; no navbar, chapter indicators, big arrows or forgiveness-request buttons are added.

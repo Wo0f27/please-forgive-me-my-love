@@ -1,4 +1,4 @@
-/* A Little Letter — v8
+/* A Little Letter — v9
    One letter with distinct extracting, unfolding, reading, refolding and
    reinserting phases. The final tap finishes the physical letter before
    opening the closing scene. No navigation bar or artificial page breaks. */
@@ -27,8 +27,8 @@
   let timers = [];
 
   const durations = {
-    extract: 860, unfold: 690, heartBurst: 1500,
-    refold: 820, insert: 680, seal: 910, finalHold: 280, settle: 650
+    extract: 710, unfold: 620, expand: 640, heartBurst: 1650,
+    refold: 660, insert: 550, seal: 630, finalHold: 160, settle: 80
   };
 
   function schedule(callback, duration) {
@@ -55,7 +55,7 @@
   }
 
   function updateButtons() {
-    const busy = ["extracting","unfolding","heartburst","refolding","inserting","sealing"].includes(phase);
+    const busy = ["extracting","unfolding","expanding","heartburst","refolding","inserting","sealing"].includes(phase);
     previous.disabled = current === 0 || (current === 1 && busy);
     nextButton.disabled = current === 2 || (current === 1 && (
       busy || (phase === "reading" && !readingAtEnd())
@@ -73,6 +73,7 @@
   function go(index) {
     if (index < 0 || index >= scenes.length || index === current) return;
     const old = scenes[current];
+    if (current === 2 && index === 1) envelopeStage.classList.remove("is-finishing");
     old.classList.remove("is-current");
     old.classList.add(index > current ? "was-before" : "was-after");
     old.setAttribute("aria-hidden","true");
@@ -96,10 +97,10 @@
     const open = !["closed","sealing"].includes(phase);
     const reading = phase === "reading" || phase === "heartburst";
     envelope.classList.toggle("is-open",open);
-    for (const state of ["extracting","unfolding","reading","heartburst","refolding","inserting","sealing"]) {
+    for (const state of ["extracting","unfolding","expanding","reading","heartburst","refolding","inserting","sealing"]) {
       envelope.classList.toggle("is-"+state, state === "reading" ? reading : phase === state);
     }
-    envelopeStage.classList.toggle("is-reading", ["unfolding","reading","heartburst","refolding"].includes(phase));
+    envelopeStage.classList.toggle("is-reading", ["unfolding","expanding","reading","heartburst","refolding","inserting","sealing"].includes(phase));
     cover.disabled = phase !== "closed";
     cover.setAttribute("aria-expanded",String(open));
     paper.tabIndex = reading ? 0 : -1;
@@ -122,16 +123,24 @@
       syncEnvelope();
       announce("The paper is unfolding.");
       schedule(() => {
-        phase = "reading";
+        // Hold a noninteractive, unfolded face while the sheet grows into
+        // the final reading viewport. On mobile this eliminates the race
+        // where "reading" started before its scroll container had a height.
+        phase = "expanding";
         syncEnvelope();
-        announce("Your letter is ready to read.");
+        announce("The paper is opening fully.");
         schedule(() => {
-          if (phase === "reading") {
-            paper.scrollTop = Math.max(0,Math.min(rememberedScrollTop,paper.scrollHeight-paper.clientHeight));
-            maybeBloom();
-            updateButtons();
-          }
-        },durations.settle);
+          phase = "reading";
+          syncEnvelope();
+          announce("Your letter is ready to read.");
+          schedule(() => {
+            if (phase === "reading") {
+              paper.scrollTop = Math.max(0,Math.min(rememberedScrollTop,paper.scrollHeight-paper.clientHeight));
+              maybeBloom();
+              updateButtons();
+            }
+          },durations.settle);
+        },durations.expand);
       },durations.unfold);
     },durations.extract);
   }
@@ -143,7 +152,7 @@
     const x = origin.left + origin.width / 2;
     const y = origin.top + origin.height / 2;
     const emojis = ["💗","💕","💖","💞","💘","💓","❤️","💝"];
-    const count = reducedMotion.matches ? 12 : 48;
+    const count = reducedMotion.matches ? 12 : 64;
     const fragment = document.createDocumentFragment();
     for (let i = 0; i < count; i++) {
       const heart = document.createElement("span");
@@ -152,11 +161,11 @@
       heart.style.setProperty("--heart-x", x+"px");
       heart.style.setProperty("--heart-y", y+"px");
       const angle = (i * 137.508 + 20) * Math.PI / 180;
-      const distance = 80 + (i % 8) * 26;
+      const distance = 112 + (i % 11) * 23;
       heart.style.setProperty("--heart-dx",Math.round(Math.cos(angle)*distance)+"px");
-      heart.style.setProperty("--heart-dy",Math.round(-65-Math.abs(Math.sin(angle))*distance)+"px");
-      heart.style.setProperty("--heart-delay",reducedMotion.matches?"0ms":(i%11*39)+"ms");
-      heart.style.setProperty("--heart-size",(17+(i*7)%21)+"px");
+      heart.style.setProperty("--heart-dy",Math.round(-82-Math.abs(Math.sin(angle))*distance)+"px");
+      heart.style.setProperty("--heart-delay",reducedMotion.matches?"0ms":(i%13*31)+"ms");
+      heart.style.setProperty("--heart-size",(18+(i*7)%22)+"px");
       heart.style.setProperty("--heart-end-scale",(0.7+(i%5)*0.15).toFixed(2));
       heart.style.setProperty("--heart-rotate",((-160+(i*43)%320))+"deg");
       fragment.appendChild(heart);
@@ -183,6 +192,7 @@
     if (phase !== "reading") return;
     cancelSequence();
     rememberedScrollTop = paper.scrollTop;
+    envelopeStage.classList.toggle("is-finishing",advanceToEnding);
     phase = "refolding";
     syncEnvelope();
     announce("The letter is folding.");
@@ -233,6 +243,7 @@
     rememberedScrollTop = 0;
     phase = "closed";
     paper.scrollTop = 0;
+    envelopeStage.classList.remove("is-finishing");
     garden.classList.remove("is-blooming","is-grown");
     heartLayer.replaceChildren();
     syncEnvelope();

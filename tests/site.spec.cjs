@@ -251,7 +251,7 @@ test("the letter physically extracts before unfolding and refolds before inserti
   await page.locator("#letter-paper").evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
   await page.locator("#last-heart").click();
   await expect(env).toHaveClass(/is-heartburst/);
-  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(48);
+  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(64);
   await expect(env).toHaveClass(/is-refolding/,{timeout:3300});
   await expect(env).toHaveClass(/is-inserting/,{timeout:3300});
   await expect(env).toHaveClass(/is-sealing/,{timeout:3300});
@@ -269,7 +269,7 @@ test("the only visible way forward from the completed letter is its final heart"
   await paper.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
   await expect(page.locator("#last-heart")).toHaveAttribute("aria-label","Send a burst of hearts, fold the letter, and read the last message");
   await page.locator("#last-heart").click();
-  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(48);
+  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(64);
   await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
 });
 
@@ -417,7 +417,7 @@ test("the heart finale emits a large burst before any folding or scene transitio
   const paper=page.locator("#letter-paper");
   await paper.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
   await page.locator("#last-heart").click();
-  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(48);
+  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(64);
   await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
   await expect(page.locator("#sealed")).toHaveClass(/is-current/);
   const burst=await page.locator("#heart-burst .heart-particle").first().evaluate(el=>({
@@ -432,4 +432,116 @@ test("the heart finale emits a large burst before any folding or scene transitio
   await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
   await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(0);
   await expect(page.locator(".ending-flowers span")).toHaveCount(3);
+});
+
+
+test("the unrolling letter is compact rather than a giant empty card", async ({page}) => {
+  await page.goto("/");
+  await page.locator("#start-reading").click();
+  await page.locator("#envelope-cover").click();
+  const envelope=page.locator("#envelope");
+  await expect(envelope).toHaveClass(/is-unfolding/,{timeout:2500});
+  await page.waitForTimeout(430);
+  const geometry=await page.evaluate(()=>{
+    const p=document.querySelector("#letter-paper").getBoundingClientRect();
+    const pocket=document.querySelector(".envelope-pocket").getBoundingClientRect();
+    return {height:p.height,width:p.width,bottom:p.bottom,pocketTop:pocket.top};
+  });
+  expect(geometry.height).toBeLessThanOrEqual(260);
+  expect(geometry.width).toBeLessThanOrEqual(314);
+  expect(geometry.bottom).toBeGreaterThanOrEqual(geometry.pocketTop-10);
+  expect(geometry.bottom).toBeLessThanOrEqual(geometry.pocketTop+20);
+  await page.screenshot({path:test.info().outputPath("compact-unfolding.png"),fullPage:false});
+});
+
+test("refolding meets the envelope mouth rather than hovering above it", async ({page}) => {
+  await openTheActualLetter(page);
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  const envelope=page.locator("#envelope");
+  await expect(envelope).toHaveClass(/is-refolding/,{timeout:2900});
+  await page.waitForTimeout(500);
+  const geometry=await page.evaluate(()=>{
+    const p=document.querySelector("#letter-paper").getBoundingClientRect();
+    const pocket=document.querySelector(".envelope-pocket").getBoundingClientRect();
+    return {paperBottom:p.bottom,pocketTop:pocket.top,pocketBottom:pocket.bottom,
+      paperHeight:p.height};
+  });
+  expect(geometry.paperBottom).toBeGreaterThanOrEqual(geometry.pocketTop-18);
+  expect(geometry.paperBottom).toBeLessThanOrEqual(geometry.pocketBottom+1);
+  expect(geometry.paperHeight).toBeLessThanOrEqual(165);
+  await page.screenshot({path:test.info().outputPath("refolding-at-pocket.png"),fullPage:false});
+});
+
+test("the final heart flurry remains playful but finishes before paper folding", async ({page}) => {
+  await openTheActualLetter(page);
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  const particles=page.locator("#heart-burst .heart-particle");
+  await expect(particles).toHaveCount(64);
+  await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
+  const distances=await particles.evaluateAll(els=>els.map(el=>el.style.getPropertyValue("--heart-dx")));
+  expect(new Set(distances).size).toBeGreaterThan(40);
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:3100});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7000});
+  await expect(particles).toHaveCount(0);
+});
+
+
+test("envelope heading and companion stay concealed until sealing finishes", async ({page}) => {
+  await openTheActualLetter(page);
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  const heading=page.locator(".envelope-heading");
+  await expect(page.locator("#envelope")).toHaveClass(/is-inserting/,{timeout:4900});
+  await expect(heading).toHaveCSS("opacity","0");
+  await expect(page.locator("#envelope")).toHaveClass(/is-sealing/,{timeout:1700});
+  await expect(heading).toHaveCSS("opacity","0");
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:3200});
+});
+
+
+test("the envelope greeting never bleeds into the closing scene", async ({page}) => {
+  await openTheActualLetter(page);
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7300});
+  await expect(page.locator(".envelope-stage")).toHaveClass(/is-finishing/);
+  await expect(page.locator(".envelope-heading")).toHaveCSS("opacity","0");
+  await expect(page.locator(".envelope-companion")).toHaveCSS("opacity","0");
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.locator("#sealed")).toHaveClass(/is-current/);
+  await expect(page.locator(".envelope-stage")).not.toHaveClass(/is-finishing/);
+});
+
+
+test("reading state begins only after mobile parchment finishes expanding", async ({page}) => {
+  await page.setViewportSize({width:390,height:640});
+  await page.goto("/");
+  await page.locator("#start-reading").click();
+  await page.locator("#envelope-cover").click();
+  const env=page.locator("#envelope");
+  const paper=page.locator("#letter-paper");
+  await expect(env).toHaveClass(/is-unfolding/);
+  await expect(env).toHaveClass(/is-expanding/,{timeout:3100});
+  await expect(paper).toHaveAttribute("aria-hidden","true");
+  await expect(env).toHaveClass(/is-reading/,{timeout:2500});
+  const m=await paper.evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    return {height:r.height,viewport:window.innerHeight,scroll:el.scrollHeight,
+      view:el.clientHeight,overflow:getComputedStyle(el).overflowY};
+  });
+  expect(m.height).toBeGreaterThan(m.viewport*.68);
+  expect(m.scroll).toBeGreaterThan(m.view+300);
+  expect(m.overflow).toBe("auto");
+  await paper.evaluate(el=>{el.scrollTop=Math.round(el.scrollHeight*.4)});
+  expect(await paper.evaluate(el=>el.scrollTop)).toBeGreaterThan(100);
 });
