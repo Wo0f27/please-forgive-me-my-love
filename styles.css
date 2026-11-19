@@ -320,6 +320,9 @@ body{background:#fff1e9;color:var(--text)}
 .paper-garden .garden-flower .garden-stem{stroke-dasharray:520;stroke-dashoffset:520}
 .paper-garden .garden-flower .garden-leaf,.paper-garden .garden-flower .garden-petals{
   opacity:0;transform-box:fill-box;transform-origin:center bottom}
+.paper-garden.is-grown .garden-stem{stroke-dashoffset:0!important;animation:none!important}
+.paper-garden.is-grown .garden-leaf,.paper-garden.is-grown .garden-petals{
+  opacity:1!important;transform:none!important;animation:none!important}
 .paper-garden.is-blooming .garden-stem{animation:paperStem 1.55s calc(.08s + var(--bloom-delay)) ease-out forwards}
 .paper-garden.is-blooming .garden-leaf{animation:paperLeaf .9s calc(.95s + var(--bloom-delay)) ease-out forwards}
 .paper-garden.is-blooming .garden-leaf-b{animation-delay:calc(1.22s + var(--bloom-delay))}
