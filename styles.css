@@ -514,7 +514,7 @@ body{background:#fff1e9;color:var(--text)}
    inside a still-resizing sheet. */
 .envelope.is-reading .parchment{
   opacity:1!important;
-  transition:opacity .28s ease .48s!important;
+  transition:opacity .25s ease .33s!important;
 }
 .envelope.is-heartburst .parchment{transition:none!important}
 /* Make the folded letter settle against the envelope opening rather than

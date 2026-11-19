@@ -99,7 +99,7 @@
     for (const state of ["extracting","unfolding","reading","heartburst","refolding","inserting","sealing"]) {
       envelope.classList.toggle("is-"+state, state === "reading" ? reading : phase === state);
     }
-    envelopeStage.classList.toggle("is-reading", ["unfolding","reading","heartburst","refolding"].includes(phase));
+    envelopeStage.classList.toggle("is-reading", ["unfolding","reading","heartburst","refolding","inserting","sealing"].includes(phase));
     cover.disabled = phase !== "closed";
     cover.setAttribute("aria-expanded",String(open));
     paper.tabIndex = reading ? 0 : -1;

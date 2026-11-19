@@ -490,3 +490,18 @@ test("the final heart flurry remains playful but finishes before paper folding",
   await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7000});
   await expect(particles).toHaveCount(0);
 });
+
+
+test("envelope heading and companion stay concealed until sealing finishes", async ({page}) => {
+  await openTheActualLetter(page);
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  const heading=page.locator(".envelope-heading");
+  await expect(page.locator("#envelope")).toHaveClass(/is-inserting/,{timeout:4900});
+  await expect(heading).toHaveCSS("opacity","0");
+  await expect(page.locator("#envelope")).toHaveClass(/is-sealing/,{timeout:1700});
+  await expect(heading).toHaveCSS("opacity","0");
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:3200});
+});
