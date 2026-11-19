@@ -74,6 +74,17 @@ def remove_connected_background(img: Image.Image, name: str) -> Image.Image:
             if aa>35 and difference((rr,gg,bb))>threshold:
                 ip[x,y]=255
     edge=ink.filter(ImageFilter.MaxFilter(13)).filter(ImageFilter.MinFilter(13))
+    # Some printed stickers are cropped at the bottom. Close the open
+    # boundary only in the segmentation mask, never on the artwork itself,
+    # so Peach's white body remains solid rather than being erased.
+    if name in ("tender-hug", "ending-hug"):
+        from PIL import ImageDraw
+        edge_pixels=edge.load()
+        for lower_y in range(h-2,0,-1):
+            xs=[x for x in range(w) if edge_pixels[x,lower_y]>150]
+            if len(xs)>5:
+                ImageDraw.Draw(edge).line((min(xs),lower_y,max(xs),lower_y),fill=255,width=10)
+                break
     ep=edge.load()
     outside=bytearray(w*h)
     q=deque()
