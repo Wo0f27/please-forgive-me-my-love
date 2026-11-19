@@ -368,11 +368,17 @@ body{background:#fff1e9;color:var(--text)}
 .paper-garden .bloom-art{overflow:visible}
 .paper-garden .garden-flower .garden-stem{stroke-dasharray:none;stroke-dashoffset:0}
 .paper-garden .garden-flower .garden-leaf{opacity:1;transform:none;animation:none!important}
-.paper-garden .garden-flower .garden-petals{opacity:.48;transform:scale(.8);
-  transform-origin:center;transition:opacity .2s}
+.paper-garden .garden-flower .garden-petals{opacity:.74;transform:scale(.93);
+  transform-origin:center;transition:none}
 .paper-garden.is-blooming .garden-stem{animation:none!important;stroke-dashoffset:0!important}
 .paper-garden.is-blooming .garden-petals{
-  animation:paperPetals .76s calc(.03s + var(--bloom-delay)) cubic-bezier(.21,.86,.23,1) forwards}
+  animation:paperPetals .55s calc(.03s + var(--bloom-delay)) cubic-bezier(.21,.86,.23,1) forwards}
+.paper-garden.is-grown .garden-flower .garden-petals{
+  opacity:1!important;transform:none!important;transition:none!important;animation:none!important}
+@keyframes paperPetals{
+  0%{opacity:.74;transform:scale(.93) rotate(-3deg)}
+  78%{opacity:1}100%{opacity:1;transform:scale(1) rotate(0deg)}
+}
 .paper-garden.is-blooming .garden-leaf{opacity:1;animation:none!important}
 .paper-garden .bouquet-wrap{filter:drop-shadow(0 3px 3px #bb829238)}
 .bouquet-ribbon{transform-origin:center}
