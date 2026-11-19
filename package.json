@@ -1,0 +1,13 @@
+{
+  "name": "a-little-letter-for-you",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Static GitHub Pages site. Playwright is used for development-only browser checks.",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  }
+}
