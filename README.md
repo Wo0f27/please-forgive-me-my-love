@@ -1,46 +1,43 @@
 # A little letter for you
 
-A dark, cozy Peach and Goma apology website. This is a small personal site, not a frontend framework demo.
+A small, cutesy-cozy Peach and Goma apology website, published on GitHub Pages.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
-## Reading the letter
+## Version 7 — a paper letter that unfolds and returns home
 
-Open the envelope to reveal the actual full apology. The paper lifts from the envelope pocket and expands into a single, vertically scrollable parchment. There is no separate preview letter, artificial page break, or secondary long-letter scene.
+The interface is deliberately minimal. There is no header, chapter indicator, visible page arrows, or forced forgiveness interaction. A warm cream-and-blush backdrop replaces Version 6's dark night colors.
 
-- The fold-shaped corner at the top-right of the paper closes the letter, even on mobile.
-- Closing the letter remembers your reading position, which is restored after opening it again.
-- The reader uses native scrolling, but the scrollbar is visually hidden to reduce the sense of a web panel. A softly curled top and actual ragged paper end give it a continuous stationery appearance.
-- On short desktop browser windows and small mobile viewports, the fully open letter stays within the viewport. It does not inherit the compact positioning used only by the opening animation.
-- Swipe between the opening and the envelope. Vertical scrolling inside the letter does not change scenes; at the end, a little heart opens the final message.
-- Keyboard users can press Escape to close the letter and use focus-revealed navigation controls. Reduced-motion preferences are respected for site transitions.
+The experience contains three connected scenes:
+
+1. **Hey, My Love.** A simple greeting and a gentle invitation button.
+2. **The actual letter.** Tap the sealed envelope. Its flap opens and the real parchment rises out **still folded**. Only once it has cleared the pocket does it visibly **unfold** into the long, native-scrollable apology. Near the end are the original three pastel flowers from the Ash garden, blooming on the paper itself.
+3. **A soft ending.** At the very bottom of the parchment, tap the **heart**. The sheet visibly **refolds, slips back into the envelope, and seals**, then the final scene opens. The heart is the only visible in-letter close/continue control. There is no upper-right fold button.
+
+Between scenes, the page uses a quiet dissolve and a handful of short-lived floating pastel petals rather than a conventional slider transition. Mobile horizontal swipes work outside the scrollable letter; vertical swipes inside the letter always remain native. Keyboard users can use Escape to return the paper to the envelope without advancing, or use focused navigation controls that remain hidden until tabbed to.
+
+Reduced-motion preferences skip the choreography and show the full flower illustration without motion. The substantive apology text, Peach and Goma illustrations and the previous user-approved "My Love" greeting remain intact.
+
+## The flowers from Ash
+
+The three flowers—peach, cream and lavender, with stems and leaves that grow before their petals open—come directly from the SVG and CSS in the user's [For Ash](https://github.com/Wo0f27/for-ash) site. Only the **flower shapes and their growth mechanism** were reused. Ash's personal messages, dark garden backdrop, unrelated celebrations, and story text were not carried into this apology.
+
+The For Ash flower mechanism credited inspiration from [FIQTOR](https://github.com/FIQTOR) through its THIRD_PARTY_NOTICES.md. The envelope layering was inspired by [zspxx's animated-envelope](https://github.com/zspxx/animated-envelope) (MIT).
 
 ## Artwork
 
-Peach and Goma are created by Bu Jue Xiao Xiao. The user has reported explicit permission to use the artwork on this personal public website.
+Peach and Goma characters were created by Bu Jue Xiao Xiao. The user states the creator/rightsholder gave permission for this public personal project. The user-supplied transparent landing PNG and six separately stored still images under \`assets/stickers/\` ship **inside the repository**, so the website does not require image hotlinks. The images were extracted from previously selected Peach and Goma sticker references, then conservatively cut out to preserve the white-cat silhouette.
 
-The landing and the envelope companion use the same **locally hosted transparent PNG**, from the image supplied by the user. Other illustrations originate from the seven Tenor image references in earlier versions.
+## Source and testing
 
-For durability, the one-time \`tools/vendor_stickers.py\` utility can download six of those references to \`assets/stickers/\`, convert animated files to still images (to respect quiet reading and reduced motion), and remove only *border-connected near-white matte areas*. It keeps the original subjects; it does not generate new drawings. The utility changes image paths in \`index.html\` only when an image has been saved successfully.
+- \`index.html\` — full letter, Ash flower SVG, stationery scene structure.
+- \`styles.css\` — cozy blush-and-cream palette, paper stage animation, bloom/petal motion and short-screen layouts.
+- \`app.js\` — seven-stage envelope interaction, native scrolling, end-heart progression, gesture/keyboard support.
+- \`assets/\` — locally stored art.
+- \`tests/site.spec.cjs\` — Playwright tests for mobile and desktop, including short-height and reduced-motion cases.
+- \`.github/workflows/site-qa.yml\` — automated Chromium checks.
 
-If an external image could not be vendored, its original URL remains and the existing local transparent illustration is used as a fallback. Static assets are preferable to a third-party image hotlink for long-term reliability.
-
-The site is unofficial and makes no claim of endorsement by the creator.
-
-## Editing and testing
-
-The runtime uses plain HTML, CSS and JavaScript:
-
-- \`index.html\` — actual letter, visuals and the three scene sections.
-- \`styles.css\` — dark rose nighttime room, envelope layers, responsive parchment.
-- \`app.js\` — opening/folding, saved reading position, scrolling, swipes and keyboard handling.
-- \`assets/\` — locally stored, user-authorized images.
-- \`tests/site.spec.cjs\` — Playwright browser checks including 390×640, 360×600, 1280×614 and landscape 844×390.
-- \`.github/workflows/site-qa.yml\` — GitHub-hosted browser QA on pull requests and main branch.
-
-No client-side framework, external scripts, cookies, analytics or paid API is needed.
-
-To test locally:
+Runtime requires no build step, analytics, cookies, paid API, external JavaScript or framework. To run browser checks:
 
 \`\`\`sh
 npm install
@@ -48,6 +45,4 @@ npx playwright install chromium
 npm test
 \`\`\`
 
-The envelope construction adapts the user's For Ash website and the MIT-licensed idea from https://github.com/zspxx/animated-envelope.
-
-**Privacy:** The repository and GitHub Pages site are public. The \`noindex\` tag is not authentication or access control.
+The repository and site are public. The \`noindex\` tag does not make either private.
