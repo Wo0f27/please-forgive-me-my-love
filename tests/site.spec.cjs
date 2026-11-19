@@ -116,13 +116,13 @@ test("horizontal swipe on intro still navigates without visible arrows", async (
 });
 
 
-test("landing page respects My Love greeting, transparent PNG and restrained copy", async ({page}) => {
+test("landing page respects My Love greeting, transparent animated sticker and restrained copy", async ({page}) => {
   await page.goto("/");
   await expect(page.locator("#intro-title")).toHaveText("Hey, My Love.");
   await expect(page.locator("#beginning .soft-line")).toHaveText("There's something I want you to read.");
   await expect(page.locator("#beginning p")).toHaveCount(1);
   const sticker = page.locator(".art-opening");
-  await expect(sticker).toHaveAttribute("src","./assets/peach-goma-transparent.png");
+  await expect(sticker).toHaveAttribute("src","./assets/stickers/tender-hug.webp");
   await expect(sticker).toHaveJSProperty("complete",true);
   const alpha = await sticker.evaluate(img=>{
     const canvas=document.createElement("canvas");
@@ -185,7 +185,7 @@ test("the envelope companion is a locally stored transparent sticker", async ({p
   await page.goto("/");
   await page.locator("#start-reading").click();
   const img=page.locator(".envelope-companion");
-  await expect(img).toHaveAttribute("src","./assets/peach-goma-transparent.png");
+  await expect(img).toHaveAttribute("src","./assets/stickers/little-kiss.webp");
   await expect.poll(()=>img.evaluate(el=>el.naturalWidth)).toBeGreaterThan(0);
 });
 
@@ -544,4 +544,95 @@ test("reading state begins only after mobile parchment finishes expanding", asyn
   expect(m.overflow).toBe("auto");
   await paper.evaluate(el=>{el.scrollTop=Math.round(el.scrollHeight*.4)});
   expect(await paper.evaluate(el=>el.scrollTop)).toBeGreaterThan(100);
+});
+
+
+
+test("closing page has no read-it-again control, without altering its messages", async ({page}) => {
+  await page.goto("/");
+  await expect(page.locator("#again")).toHaveCount(0);
+  await expect(page.getByRole("button",{name:/read it again/i})).toHaveCount(0);
+  await expect(page.locator("#ending-title")).toHaveText("I love you.");
+  await expect(page.locator("#one-last-thing p")).toHaveCount(2);
+});
+
+test("all eight visible stickers use full-resolution local animated WebP with static reduced-motion alternates", async ({page}) => {
+  await page.goto("/");
+  await expect(page.locator("picture.animated-sticker")).toHaveCount(8);
+  await expect(page.locator('img[src$=".webp"]')).toHaveCount(8);
+  await expect(page.locator('picture source[media="(prefers-reduced-motion: reduce)"]')).toHaveCount(8);
+  await expect(page.locator('img[src*="tenor.com"]')).toHaveCount(0);
+  const manifest=await page.evaluate(async ()=>{
+    const r=await fetch("./assets/stickers/animations.json");
+    if(!r.ok) throw new Error("Animation metadata missing: "+r.status);
+    return r.json();
+  });
+  expect(manifest.failed).toEqual([]);
+  expect(manifest.animations).toHaveLength(6);
+  for(const item of manifest.animations){
+    expect(item.frames,item.name).toBeGreaterThan(1);
+    expect(item.width,item.name).toBeGreaterThanOrEqual(450);
+    expect(item.height,item.name).toBeGreaterThanOrEqual(400);
+    expect(item.duration_ms,item.name).toBeGreaterThan(300);
+    expect(item.bytes,item.name).toBeLessThan(9_000_000);
+  }
+  const loaded=await page.evaluate(async()=>{
+    const paths=[...new Set([...document.querySelectorAll('img[src$=".webp"]')]
+      .map(el=>el.getAttribute("src")))];
+    const results=[];
+    for(const path of paths){
+      const img=new Image();
+      img.src=path;
+      await img.decode();
+      const canvas=document.createElement("canvas");
+      canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+      const ctx=canvas.getContext("2d");
+      ctx.drawImage(img,0,0);
+      results.push({path,width:img.naturalWidth,
+        alpha:ctx.getImageData(0,0,1,1).data[3]});
+    }
+    return results;
+  });
+  expect(loaded).toHaveLength(6);
+  for(const image of loaded){
+    expect(image.width,image.path).toBeGreaterThanOrEqual(450);
+    expect(image.alpha,image.path).toBeLessThan(32);
+  }
+});
+
+test("restored GIF-based artwork visibly animates in rendered screenshots", async ({page}) => {
+  await openTheActualLetter(page);
+  // Drawing an animated image to canvas returns the first frame in some
+  // Chromium versions. The real browser rendering is the correct test.
+  await page.addStyleTag({content:
+    ".ambient-petals,.scene-petals{visibility:hidden!important}"+
+    ".letter-illustration img{filter:none!important}"});
+  for(const name of ["sad-tears","little-kiss"]){
+    const img=page.locator('#letter-paper img[src$="/'+name+'.webp"]');
+    await img.scrollIntoViewIfNeeded();
+    await expect.poll(()=>img.evaluate(el=>el.naturalWidth)).toBeGreaterThan(450);
+    const screenshots=[];
+    for(let i=0;i<4;i++){
+      screenshots.push((await img.screenshot()).toString("base64"));
+      await page.waitForTimeout(390);
+    }
+    const unique=new Set(screenshots);
+    expect(unique.size,name+" should visibly change poses").toBeGreaterThan(1);
+  }
+});
+
+test("reduced-motion users receive the original transparent still alternatives", async ({page}) => {
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await page.goto("/");
+  await expect(page.locator("picture.animated-sticker")).toHaveCount(8);
+  const sources=await page.locator('picture.animated-sticker source').evaluateAll(
+    els=>els.map(el=>({media:el.media,source:el.srcset})));
+  expect(sources).toHaveLength(8);
+  for(const source of sources){
+    expect(source.media).toBe("(prefers-reduced-motion: reduce)");
+    expect(source.source).toMatch(/\.png$/);
+  }
+  const intro=await page.locator(".art-opening").evaluate(el=>el.currentSrc);
+  expect(intro).toMatch(/\.png$/);
+  await expect(page.locator("#again")).toHaveCount(0);
 });

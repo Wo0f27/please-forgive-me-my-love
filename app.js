@@ -1,4 +1,4 @@
-/* A Little Letter — v9
+/* A Little Letter — v10
    One letter with distinct extracting, unfolding, reading, refolding and
    reinserting phases. The final tap finishes the physical letter before
    opening the closing scene. No navigation bar or artificial page breaks. */
@@ -238,18 +238,6 @@
     }
   }
 
-  function restart() {
-    cancelSequence();
-    rememberedScrollTop = 0;
-    phase = "closed";
-    paper.scrollTop = 0;
-    envelopeStage.classList.remove("is-finishing");
-    garden.classList.remove("is-blooming","is-grown");
-    heartLayer.replaceChildren();
-    syncEnvelope();
-    go(0);
-  }
-
   function maybeBloom() {
     if (!garden || garden.classList.contains("is-blooming") || phase !== "reading") return;
     if (reducedMotion.matches) {
@@ -271,7 +259,6 @@
   document.getElementById("start-reading").addEventListener("click", () => go(1));
   cover.addEventListener("click",openEnvelope);
   lastHeart.addEventListener("click", launchHeartFinale);
-  document.getElementById("again").addEventListener("click",restart);
   previous.addEventListener("click",back);
   nextButton.addEventListener("click",next);
   paper.addEventListener("scroll",() => {

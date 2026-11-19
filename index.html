@@ -7,16 +7,19 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="description" content="A letter I should have written with more care.">
   <title>A little letter for you</title>
-  <link rel="stylesheet" href="./styles.css?v=9">
-  <script src="./app.js?v=9" defer></script>
+  <link rel="stylesheet" href="./styles.css?v=10">
+  <script src="./app.js?v=10" defer></script>
 </head>
 <body>
   <div class="room" aria-hidden="true"><span class="lamplight"></span><div class="ambient-petals"><i style="--petal-left:4%;--petal-delay:-7s;--petal-duration:16s;--petal-drift:-20px;--petal-color:#f0abc7;--petal-scale:.8" aria-hidden="true"></i><i style="--petal-left:12%;--petal-delay:-11s;--petal-duration:20s;--petal-drift:50px;--petal-color:#f6c3a5;--petal-scale:.65" aria-hidden="true"></i><i style="--petal-left:21%;--petal-delay:-4s;--petal-duration:14s;--petal-drift:-39px;--petal-color:#e6b5df;--petal-scale:.75" aria-hidden="true"></i><i style="--petal-left:29%;--petal-delay:-16s;--petal-duration:22s;--petal-drift:46px;--petal-color:#f3acc5;--petal-scale:.65" aria-hidden="true"></i><i style="--petal-left:35%;--petal-delay:-8s;--petal-duration:19s;--petal-drift:-50px;--petal-color:#f6d4ac;--petal-scale:.7" aria-hidden="true"></i><i style="--petal-left:43%;--petal-delay:-3s;--petal-duration:16s;--petal-drift:20px;--petal-color:#dfb3d8;--petal-scale:.7" aria-hidden="true"></i><i style="--petal-left:50%;--petal-delay:-10s;--petal-duration:18s;--petal-drift:-43px;--petal-color:#f1b4c4;--petal-scale:.9" aria-hidden="true"></i><i style="--petal-left:56%;--petal-delay:-14s;--petal-duration:21s;--petal-drift:38px;--petal-color:#f4ccb2;--petal-scale:.7" aria-hidden="true"></i><i style="--petal-left:63%;--petal-delay:-2s;--petal-duration:17s;--petal-drift:-30px;--petal-color:#dcb6df;--petal-scale:.75" aria-hidden="true"></i><i style="--petal-left:69%;--petal-delay:-12s;--petal-duration:20s;--petal-drift:63px;--petal-color:#f1b6c8;--petal-scale:.6" aria-hidden="true"></i><i style="--petal-left:75%;--petal-delay:-6s;--petal-duration:15s;--petal-drift:-37px;--petal-color:#f6d1ad;--petal-scale:.8" aria-hidden="true"></i><i style="--petal-left:81%;--petal-delay:-13s;--petal-duration:24s;--petal-drift:31px;--petal-color:#e8bad5;--petal-scale:.75" aria-hidden="true"></i><i style="--petal-left:88%;--petal-delay:-9s;--petal-duration:19s;--petal-drift:-45px;--petal-color:#ecabc0;--petal-scale:.75" aria-hidden="true"></i><i style="--petal-left:95%;--petal-delay:-1s;--petal-duration:18s;--petal-drift:-62px;--petal-color:#f1cbb7;--petal-scale:.6" aria-hidden="true"></i><i style="--petal-left:17%;--petal-delay:-18s;--petal-duration:25s;--petal-drift:55px;--petal-color:#f4b6be;--petal-scale:.75" aria-hidden="true"></i><i style="--petal-left:72%;--petal-delay:-20s;--petal-duration:23s;--petal-drift:-55px;--petal-color:#dcc6e8;--petal-scale:.65" aria-hidden="true"></i><i style="--petal-left:46%;--petal-delay:-12s;--petal-duration:24s;--petal-drift:40px;--petal-color:#f5c5ac;--petal-scale:.6" aria-hidden="true"></i><i style="--petal-left:91%;--petal-delay:-8s;--petal-duration:23s;--petal-drift:-33px;--petal-color:#e6bbd6;--petal-scale:.75" aria-hidden="true"></i></div></div>
   <main class="experience" id="experience" aria-label="A letter, just for you">
     <section class="scene is-current" id="beginning" data-scene="0" aria-labelledby="intro-title">
       <div class="opening">
-        <img class="art art-opening" src="./assets/peach-goma-transparent.png" width="171" height="148"
-          alt="Peach and Goma holding each other beside a heart" fetchpriority="high">
+        <picture class="animated-sticker animated-sticker-opening">
+          <source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="./assets/peach-goma-transparent.png">
+          <img class="art art-opening" src="./assets/stickers/tender-hug.webp" data-fallback="./assets/peach-goma-transparent.png"
+            width="476" height="449" alt="Peach and Goma hugging beneath a heart" fetchpriority="high">
+        </picture>
         <h1 id="intro-title">Hey, My Love.</h1>
         <p class="soft-line">There's something I want you to read.</p>
         <button type="button" class="opening-link" id="start-reading" aria-label="Open the letter"><span class="button-text">a letter for you</span><span class="button-seal" aria-hidden="true">♡</span></button>
@@ -26,8 +29,12 @@
     <section class="scene scene-envelope" id="sealed" data-scene="1" aria-labelledby="envelope-title" aria-hidden="true" inert>
       <div class="envelope-stage">
         <h2 id="envelope-title" class="envelope-heading">From me, to you.</h2>
-        <img class="art envelope-companion" src="./assets/peach-goma-transparent.png" width="171" height="148" loading="lazy"
-          alt="Peach and Goma resting together beside a little heart">
+        <picture class="animated-sticker animated-sticker-companion">
+          <source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="./assets/peach-goma-transparent.png">
+          <img class="art envelope-companion" src="./assets/stickers/little-kiss.webp"
+            data-fallback="./assets/peach-goma-transparent.png" width="498" height="467" loading="lazy"
+            alt="Peach hugs Goma with a little red heart above them">
+        </picture>
 
         <div class="envelope" id="envelope">
           <div class="envelope-back" aria-hidden="true"></div>
@@ -52,36 +59,36 @@
                 <p>When you told me what you were feeling, I should have listened. Instead, there were times I took your words as something I needed to defend myself against. I was so caught up in how I felt that I didn't give you the patience or understanding you were asking for.</p>
 
                 <figure class="letter-illustration">
-                  <img src="./assets/stickers/sad-tears.png"
-                       data-fallback="./assets/peach-goma-transparent.png" referrerpolicy="no-referrer"
-                       width="500" height="500" loading="lazy" alt="Peach looking sad, with tears in her eyes">
+                  <picture class="animated-sticker"><source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="./assets/stickers/sad-tears.png"><img src="./assets/stickers/sad-tears.webp"
+                       data-fallback="./assets/stickers/sad-tears.png" referrerpolicy="no-referrer"
+                       width="460" height="418" decoding="async" loading="lazy" alt="Peach looking sad, with tears in her eyes"></picture>
                 </figure>
 
                 <p>That wasn't fair. You were trying to be honest with someone who should make it safe for you to do that. I made those conversations more exhausting than they needed to be. I know that being heard shouldn't have been something you had to keep fighting for.</p>
                 <p>I also heard what you said about feeling like you were the only one putting effort into us. I don't want to brush that aside or tell you that I care as though saying it proves anything. I can see how my actions have made it harder for you to feel that we're facing things together.</p>
 
                 <figure class="letter-illustration letter-illustration-wide">
-                  <img src="./assets/stickers/comfort.png"
-                       data-fallback="./assets/peach-goma-transparent.png" referrerpolicy="no-referrer"
-                       width="498" height="498" loading="lazy" alt="Goma comforting a tearful Peach">
+                  <picture class="animated-sticker"><source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="./assets/stickers/comfort.png"><img src="./assets/stickers/comfort.webp"
+                       data-fallback="./assets/stickers/comfort.png" referrerpolicy="no-referrer"
+                       width="498" height="482" decoding="async" loading="lazy" alt="Goma comforting a tearful Peach"></picture>
                 </figure>
 
                 <p>I've leaned on my insecurity as an explanation for my reactions. It may explain where some of those feelings come from, but it doesn't excuse the way I've treated you. Those are things I need to work through without making you carry them for me.</p>
                 <p>I want to learn to sit with an uncomfortable conversation without immediately trying to win it. If I misunderstand you, I can ask instead of assuming. When I get defensive, I need to notice it, be accountable, and return to the conversation with care. I want to put in effort when life is ordinary, too, not only when I'm afraid of losing something.</p>
 
                 <figure class="letter-illustration">
-                  <img src="./assets/stickers/back-hug.png"
-                       data-fallback="./assets/peach-goma-transparent.png" referrerpolicy="no-referrer"
-                       width="498" height="498" loading="lazy" alt="Peach hugging Goma from behind">
+                  <picture class="animated-sticker"><source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="./assets/stickers/back-hug.png"><img src="./assets/stickers/back-hug.webp"
+                       data-fallback="./assets/stickers/back-hug.png" referrerpolicy="no-referrer"
+                       width="472" height="468" decoding="async" loading="lazy" alt="Peach hugging Goma from behind"></picture>
                 </figure>
 
                 <p>I'm not writing this because I expect everything to be okay after you read it. This website doesn't change the past, and I don't want to make an apology into another thing you have to comfort me about.</p>
                 <p>I love you. I want you to feel safe telling me what matters to you. More than that, I want to become someone who listens closely enough that you don't have to repeat the same hurt over and over.</p>
 
                 <figure class="letter-illustration letter-illustration-small">
-                  <img src="./assets/stickers/little-kiss.png"
-                       data-fallback="./assets/peach-goma-transparent.png" referrerpolicy="no-referrer"
-                       width="500" height="500" loading="lazy" alt="Peach and Goma embracing beneath a little heart">
+                  <picture class="animated-sticker"><source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="./assets/stickers/little-kiss.png"><img src="./assets/stickers/little-kiss.webp"
+                       data-fallback="./assets/stickers/little-kiss.png" referrerpolicy="no-referrer"
+                       width="498" height="467" decoding="async" loading="lazy" alt="Peach and Goma embracing beneath a little heart"></picture>
                 </figure>
 
                 <p>You don't have to forgive me right away, or respond before you're ready. I just wanted to acknowledge what you've been telling me, and take responsibility for the part I've played in making things difficult between us.</p>
@@ -104,9 +111,9 @@
                 </figure>
                 <p class="letter-signoff">With love,<span>me ♡</span></p>
                 <figure class="letter-illustration letter-illustration-end">
-                  <img src="./assets/stickers/tender-hug.png"
-                       data-fallback="./assets/peach-goma-transparent.png" referrerpolicy="no-referrer"
-                       width="512" height="512" loading="lazy" alt="Peach and Goma sharing a comforting hug">
+                  <picture class="animated-sticker"><source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="./assets/stickers/tender-hug.png"><img src="./assets/stickers/tender-hug.webp"
+                       data-fallback="./assets/stickers/tender-hug.png" referrerpolicy="no-referrer"
+                       width="476" height="449" decoding="async" loading="lazy" alt="Peach cuddles Goma as a heart floats beside them"></picture>
                 </figure>
                 <button type="button" id="last-heart" class="last-heart" aria-label="Send a burst of hearts, fold the letter, and read the last message"><span aria-hidden="true">♡</span></button>
               </div>
@@ -122,14 +129,14 @@
 
     <section class="scene" id="one-last-thing" data-scene="2" aria-labelledby="ending-title" aria-hidden="true" inert>
       <div class="ending">
-        <img class="art art-ending" src="./assets/stickers/ending-hug.png"
-             data-fallback="./assets/peach-goma-transparent.png" referrerpolicy="no-referrer"
-             width="498" height="406" loading="lazy" alt="Peach and Goma sharing a reassuring embrace">
+        <picture class="animated-sticker"><source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="./assets/stickers/ending-hug.png"><img class="art art-ending" src="./assets/stickers/ending-hug.webp"
+             data-fallback="./assets/stickers/ending-hug.png" referrerpolicy="no-referrer"
+             width="498" height="434" decoding="async" loading="lazy" alt="Peach and Goma sharing a reassuring embrace"></picture>
         <h2 id="ending-title">I love you.</h2>
         <p>I know that what matters now is how I treat you, long after this letter is closed.</p>
         <p>Thank you for telling me how you feel, even when I haven't made it easy.</p>
         <div class="ending-flowers" aria-hidden="true"><span>✿</span><span>❀</span><span>✿</span></div>
-        <button type="button" id="again" class="again">read it again</button>
+        
       </div>
     </section>
   </main>

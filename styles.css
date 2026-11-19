@@ -137,8 +137,6 @@ p{line-height:1.7}
 .art-ending{width:min(220px,40vw);height:auto;max-height:31vh;filter:drop-shadow(0 12px 18px #0004)}
 .ending h2{font-size:clamp(46px,7vw,73px);margin:8px 0 2px}
 .ending p{max-width:530px;font-size:clamp(17px,2vw,20px);color:#e2d7ce;margin:0 0 5px}
-.again{margin-top:14px;background:none;border:0;border-bottom:1px solid #a9927c;color:#dfbe9e;padding:7px;font:italic 17px Georgia,serif}
-.again:hover{color:#ffebd2}
 .accessible-navigation{position:absolute;z-index:30;top:0;left:0}
 .accessible-navigation button{position:absolute;top:-105px;left:10px;background:#f0e5d4;color:#263037;
  border:2px solid #907870;padding:11px 17px;white-space:nowrap}
@@ -186,8 +184,8 @@ p{line-height:1.7}
  .opening-link{justify-self:start}
  .ending{display:grid;grid-template-columns:175px 1fr;column-gap:19px;text-align:left;max-width:760px}
  .art-ending{grid-row:1/5;grid-column:1;width:160px;max-height:none}
- .ending h2,.ending p,.again{grid-column:2}
- .ending h2{font-size:39px}.ending p{font-size:13px}.again{justify-self:start}
+ .ending h2,.ending p{grid-column:2}
+ .ending h2{font-size:39px}.ending p{font-size:13px}
 }
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;transition-delay:0s!important}
@@ -255,8 +253,6 @@ body{background:#fff1e9;color:var(--text)}
   box-shadow:0 10px 23px #bb82913c,inset 0 1px #fff6efd9;color:#704352}
 .opening-link:hover{box-shadow:0 12px 27px #b97f8c53,inset 0 1px #fff6efd9}
 .opening-link .button-seal{background:#b8708d}
-.again{color:#9d6278;border-bottom-color:#ce9eac}
-.again:hover{color:#704a61}
 .accessible-navigation button{background:#fffaf1;color:#74516a;border-color:#d7acbd}
 .last-heart{color:#ac7087;min-width:52px;min-height:51px;margin-top:19px;
   border-radius:50%;transition:transform .25s,color .25s}
@@ -594,3 +590,22 @@ body{background:#fff1e9;color:var(--text)}
 .envelope.is-expanding .fold-panel-lower{transform:rotateX(0deg)}
 .envelope.is-expanding .folded-seal{opacity:0}
 .envelope.is-expanding .parchment{visibility:hidden!important;opacity:0!important}
+
+
+/* V10: original Peach/Goma motion restored at full source resolution.
+   Static PNGs are selected by <picture> when reduced motion is requested.
+   Keep all stickers transparent, crisp and visually integrated with paper. */
+.animated-sticker{display:block;line-height:0;max-width:100%}
+.animated-sticker-opening{width:fit-content;max-width:100%;flex:none}
+.animated-sticker-companion{display:contents}
+.letter-illustration .animated-sticker{width:100%}
+.animated-sticker img{image-rendering:auto;object-fit:contain}
+.letter-illustration .animated-sticker img{
+  width:100%;height:auto;mix-blend-mode:normal;
+  filter:drop-shadow(0 4px 5px #b38b8c18)
+}
+.ending .animated-sticker{max-width:100%;align-self:center}
+.ending .animated-sticker .art-ending{
+  max-width:100%;height:auto;
+  filter:drop-shadow(0 9px 18px #c2899b40)
+}
