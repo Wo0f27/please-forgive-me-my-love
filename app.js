@@ -201,6 +201,12 @@
     const g = garden.getBoundingClientRect();
     const p = paper.getBoundingClientRect();
     const visible = Math.min(g.bottom,p.bottom)-Math.max(g.top,p.top);
+    // A direct jump to the very end should never show a vacant flower
+    // placeholder. Slow reading still gets the stem-and-petal animation.
+    if (readingAtEnd() || g.bottom < p.top) {
+      garden.classList.add("is-blooming","is-grown");
+      return;
+    }
     if (visible >= Math.min(70,g.height*.25)) garden.classList.add("is-blooming");
   }
 
