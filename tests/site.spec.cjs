@@ -81,7 +81,7 @@ test("the envelope can fold back without destroying or duplicating the letter", 
   await expect(page.locator("#letter-paper article.parchment")).toHaveCount(1);
   await page.locator("#envelope-cover").click();
   await expect(page.locator("#envelope")).toHaveClass(/is-reading/,{timeout:4500});
-  await expect(page.locator("#letter-paper .letter-hello")).toHaveText("Hey, love,");
+  await expect(page.locator("#letter-paper .letter-hello")).toHaveText("My Love,");
 });
 
 test("mobile layout keeps the letter within the viewport and images have fallbacks", async ({page}) => {
