@@ -1,26 +1,35 @@
-/* Version 3: deliberate swipe scenes, native parchment scrolling.
-   No dependencies, timers for animation only, no tracking. */
+/* A Little Letter v4 — one physical envelope, one continuous paper.
+   The real apology lives inside #letter-paper from the start. */
 (() => {
   "use strict";
-  const scenes = [...document.querySelectorAll(".scene")];
   const stage = document.getElementById("experience");
+  const scenes = [...document.querySelectorAll(".scene")];
   const previous = document.getElementById("previous-scene");
-  const following = document.getElementById("next-scene");
+  const nextButton = document.getElementById("next-scene");
   const status = document.getElementById("status");
   const envelope = document.getElementById("envelope");
-  const envelopeCover = document.getElementById("envelope-cover");
-  const foldedLetter = document.getElementById("folded-letter");
-  const parchment = document.getElementById("parchment-scroll");
-  const closingMark = document.getElementById("closing-mark");
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const envelopeStage = document.querySelector(".envelope-stage");
+  const cover = document.getElementById("envelope-cover");
+  const paper = document.getElementById("letter-paper");
+  const lastHeart = document.getElementById("last-heart");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let current = 0;
-  let envelopePhase = "closed";
-  let timer;
-  let pointerStart = null;
+  let envelopePhase = "closed"; // closed, opening, reading, folding
+  let envelopeTimer = null;
+  let swipeStart = null;
 
   function announce(message) {
     status.textContent = "";
     requestAnimationFrame(() => { status.textContent = message; });
+  }
+
+  function readingAtEnd() {
+    return paper.scrollTop + paper.clientHeight >= paper.scrollHeight - 60;
+  }
+
+  function updateButtons() {
+    previous.disabled = current === 0 || (current === 1 && (envelopePhase === "opening" || envelopePhase === "folding"));
+    nextButton.disabled = current === 2 || (current === 1 && (envelopePhase === "opening" || envelopePhase === "folding"));
   }
 
   function go(index) {
@@ -31,148 +40,150 @@
     old.setAttribute("aria-hidden", "true");
     old.inert = true;
 
-    scenes.forEach((scene, i) => {
-      if (i !== index) scene.classList.remove("is-current");
-    });
     const next = scenes[index];
     next.classList.remove("was-before", "was-after");
     next.classList.add("is-current");
     next.removeAttribute("aria-hidden");
     next.inert = false;
     current = index;
-    previous.disabled = current === 0;
-    following.disabled = current === scenes.length - 1;
-    announce(next.querySelector("h1,h2")?.textContent?.trim() || "Next part of the letter");
-    if (current === 4) updateParchment();
-    if (old.contains(document.activeElement)) document.activeElement.blur();
-    window.setTimeout(() => old.classList.remove("was-before", "was-after"), prefersReducedMotion.matches ? 0 : 500);
+    updateButtons();
+    announce(next.querySelector("h1,h2")?.textContent?.trim() || "Another page");
+    if (old.contains(document.activeElement) && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    setTimeout(() => old.classList.remove("was-before", "was-after"), reducedMotion.matches ? 0 : 550);
   }
 
-  function updateEnvelope() {
-    const opened = envelopePhase !== "closed";
-    const extracted = envelopePhase === "extracted";
-    envelope.classList.toggle("is-open", opened);
-    envelope.classList.toggle("is-extracted", extracted);
+  function syncEnvelope() {
+    const open = envelopePhase !== "closed";
+    const reading = envelopePhase === "reading";
+    envelope.classList.toggle("is-open", open);
+    envelope.classList.toggle("is-reading", reading);
+    envelopeStage.classList.toggle("is-reading", reading);
     envelope.classList.toggle("is-folding", envelopePhase === "folding");
-    envelopeCover.disabled = opened;
-    envelopeCover.setAttribute("aria-expanded", String(opened));
-    foldedLetter.disabled = !extracted;
-    foldedLetter.tabIndex = extracted ? 0 : -1;
-    foldedLetter.setAttribute("aria-hidden", String(!extracted));
+    cover.disabled = open;
+    cover.setAttribute("aria-expanded", String(open));
+    paper.tabIndex = reading ? 0 : -1;
+    paper.setAttribute("aria-hidden", String(!reading));
+    paper.inert = !reading;
+    updateButtons();
   }
 
   function openEnvelope() {
     if (envelopePhase !== "closed") return;
-    clearTimeout(timer);
+    clearTimeout(envelopeTimer);
     envelopePhase = "opening";
-    updateEnvelope();
-    timer = setTimeout(() => {
+    syncEnvelope();
+    envelopeTimer = setTimeout(() => {
       if (envelopePhase !== "opening") return;
-      envelopePhase = "extracted";
-      updateEnvelope();
-      announce("The letter is open");
-    }, prefersReducedMotion.matches ? 0 : 1030);
+      envelopePhase = "reading";
+      syncEnvelope();
+      announce("The complete letter is open. Scroll through the parchment to read it.");
+    }, reducedMotion.matches ? 0 : 990);
   }
 
   function closeEnvelope() {
-    if (envelopePhase !== "extracted") return;
-    clearTimeout(timer);
+    if (envelopePhase !== "reading") return;
+    clearTimeout(envelopeTimer);
+    paper.scrollTop = 0;
     envelopePhase = "folding";
-    updateEnvelope();
-    timer = setTimeout(() => {
+    syncEnvelope();
+    envelopeTimer = setTimeout(() => {
       if (envelopePhase !== "folding") return;
       envelopePhase = "closed";
-      updateEnvelope();
-      announce("The letter is tucked back in");
-    }, prefersReducedMotion.matches ? 0 : 500);
+      syncEnvelope();
+      announce("The letter is back inside the envelope.");
+    }, reducedMotion.matches ? 0 : 740);
   }
 
   function next() {
-    if (current === 1 && envelopePhase === "closed") return openEnvelope();
-    if (current === 1 && envelopePhase !== "extracted") return;
-    go(current + 1);
+    if (current === 0) return go(1);
+    if (current === 1) {
+      if (envelopePhase === "closed") return openEnvelope();
+      if (envelopePhase === "reading" && readingAtEnd()) return go(2);
+      return;
+    }
   }
 
   function back() {
-    if (current === 1 && envelopePhase === "extracted") return closeEnvelope();
-    if (current === 1 && envelopePhase !== "closed") return;
-    go(current - 1);
-  }
-
-  function updateParchment() {
-    const atEnd = parchment.scrollTop + parchment.clientHeight >= parchment.scrollHeight - 65;
-    closingMark.classList.toggle("is-ready", atEnd);
-    closingMark.setAttribute("aria-hidden", String(!atEnd));
-    closingMark.tabIndex = atEnd ? 0 : -1;
-    closingMark.disabled = !atEnd;
+    if (current === 2) return go(1);
+    if (current === 1) {
+      if (envelopePhase === "reading") return closeEnvelope();
+      if (envelopePhase === "closed") return go(0);
+    }
   }
 
   function restart() {
-    clearTimeout(timer);
+    clearTimeout(envelopeTimer);
     envelopePhase = "closed";
-    updateEnvelope();
-    parchment.scrollTop = 0;
-    updateParchment();
+    paper.scrollTop = 0;
+    syncEnvelope();
     go(0);
   }
 
-  envelopeCover.addEventListener("click", openEnvelope);
-  foldedLetter.addEventListener("click", closeEnvelope);
-  parchment.addEventListener("scroll", updateParchment, { passive: true });
-  closingMark.addEventListener("click", () => go(5));
+  document.getElementById("start-reading").addEventListener("click", () => go(1));
+  cover.addEventListener("click", openEnvelope);
+  lastHeart.addEventListener("click", () => {
+    if (envelopePhase === "reading") go(2);
+  });
   document.getElementById("again").addEventListener("click", restart);
   previous.addEventListener("click", back);
-  following.addEventListener("click", next);
+  nextButton.addEventListener("click", next);
 
-  for (const image of document.querySelectorAll("img[data-fallback]")) {
-    image.addEventListener("error", () => {
-      const fallback = image.getAttribute("data-fallback");
-      if (fallback) {
-        image.removeAttribute("data-fallback");
-        image.src = fallback;
-      }
+  // Each externally hosted illustration falls back to the user's local sticker.
+  for (const img of document.querySelectorAll("img[data-fallback]")) {
+    img.addEventListener("error", () => {
+      const fallback = img.getAttribute("data-fallback");
+      if (!fallback) return;
+      img.removeAttribute("data-fallback");
+      img.src = fallback;
     });
   }
 
+  // A true vertical drag inside the letter is always handled by native scrolling.
+  // Horizontal swipes within the paper never close it accidentally.
   stage.addEventListener("pointerdown", event => {
     if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
-    if (event.target.closest("button,a")) { pointerStart = null; return; }
-    pointerStart = { x:event.clientX, y:event.clientY, scrollTop:parchment.scrollTop,
-      parchment:event.target.closest(".parchment-viewport") !== null };
-  }, { passive:true });
+    if (event.target.closest("button,a")) { swipeStart = null; return; }
+    swipeStart = {
+      x:event.clientX, y:event.clientY,
+      withinPaper:!!event.target.closest("#letter-paper"),
+      scrollTop:paper.scrollTop
+    };
+  }, {passive:true});
 
   stage.addEventListener("pointerup", event => {
-    if (!pointerStart || event.target.closest("button,a")) { pointerStart = null; return; }
-    const start = pointerStart;
-    pointerStart = null;
+    if (!swipeStart || event.target.closest("button,a")) { swipeStart = null; return; }
+    const start = swipeStart;
+    swipeStart = null;
     const dx = event.clientX - start.x;
     const dy = event.clientY - start.y;
-    if (start.parchment && Math.abs(parchment.scrollTop - start.scrollTop) > 5) return;
-    if (Math.abs(dx) >= 72 && Math.abs(dx) >= Math.abs(dy) * 1.6) {
-      if (dx < 0) next(); else back();
-      return;
-    }
-    // A small, invisible tap target on the empty margins is the mouse/touch
-    // alternative to swipes. Content taps do not trigger navigation.
-    if (Math.abs(dx) > 12 || Math.abs(dy) > 12) return;
-    if (event.target.closest("p,h1,h2,img,.envelope,.parchment-viewport,.promise-prose,.reflection-words")) return;
-    const rect = stage.getBoundingClientRect();
-    const ratio = (event.clientX - rect.left) / rect.width;
-    if (ratio > .9) next();
-    else if (ratio < .1) back();
-  }, { passive:true });
-  stage.addEventListener("pointercancel", () => { pointerStart = null; }, { passive:true });
+    if (start.withinPaper && Math.abs(paper.scrollTop - start.scrollTop) > 2) return;
+    if (Math.abs(dx) < 74 || Math.abs(dx) < Math.abs(dy) * 1.55) return;
+    if (start.withinPaper && envelopePhase === "reading" && (dx > 0 || !readingAtEnd())) return;
+    if (dx < 0) next();
+    else back();
+  }, {passive:true});
+  stage.addEventListener("pointercancel", () => { swipeStart = null; }, {passive:true});
 
   document.addEventListener("keydown", event => {
     if (event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
     if (event.target.matches("input,textarea,select,[contenteditable=true]")) return;
-    if (event.key === "ArrowRight") { event.preventDefault(); next(); }
-    else if (event.key === "ArrowLeft") { event.preventDefault(); back(); }
-    else if (event.key === "Escape" && current === 1) closeEnvelope();
+    if (event.key === "ArrowRight") {
+      // The letter has normal arrow-key scrolling; do not steal that input.
+      if (current === 1 && envelopePhase === "reading" && event.target.closest("#letter-paper")) return;
+      event.preventDefault();
+      next();
+    } else if (event.key === "ArrowLeft") {
+      if (current === 1 && envelopePhase === "reading" && event.target.closest("#letter-paper")) return;
+      event.preventDefault();
+      back();
+    } else if (event.key === "Escape" && current === 1 && envelopePhase === "reading") {
+      event.preventDefault();
+      closeEnvelope();
+    }
   });
 
-  previous.disabled = true;
-  following.disabled = false;
-  updateEnvelope();
-  updateParchment();
+  updateButtons();
+  syncEnvelope();
 })();

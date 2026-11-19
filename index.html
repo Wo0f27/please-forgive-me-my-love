@@ -2,120 +2,109 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#111b21">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="description" content="A letter I should have written with more care.">
   <title>A little letter for you</title>
-  <link rel="stylesheet" href="./styles.css?v=3">
-  <script src="./app.js?v=3" defer></script>
+  <link rel="stylesheet" href="./styles.css?v=4">
+  <script src="./app.js?v=4" defer></script>
 </head>
 <body>
   <div class="room" aria-hidden="true"><span class="lamplight"></span></div>
-  <main id="experience" class="experience" aria-label="A letter, told in quiet moments">
-    <section class="scene is-current" data-scene="0" id="beginning" aria-labelledby="intro-title">
-      <div class="opening content-narrow">
+  <main class="experience" id="experience" aria-label="A letter, just for you">
+    <section class="scene is-current" id="beginning" data-scene="0" aria-labelledby="intro-title">
+      <div class="opening">
         <img class="art art-opening" src="./assets/peach-goma.webp" width="171" height="148"
-          alt="Peach and Goma cuddling with a small heart above them" fetchpriority="high">
-        <div class="opening-words">
-          <h1 id="intro-title">Hey, love.</h1>
-          <p>I've been thinking about the things you've been trying to tell me. I want to give those words the attention I should have given them before.</p>
-          <p class="quiet">There's a letter for you.</p>
-        </div>
-        <span class="first-gesture" aria-hidden="true">swipe to read</span>
+          alt="Peach and Goma holding each other beside a heart" fetchpriority="high">
+        <h1 id="intro-title">Hey, love.</h1>
+        <p>I've been thinking about the things you've been trying to tell me. I should have listened with more care.</p>
+        <p class="soft-line">There's something I want you to read.</p>
+        <button type="button" class="opening-link" id="start-reading">a letter for you <span aria-hidden="true">♡</span></button>
       </div>
     </section>
 
-    <section class="scene" data-scene="1" id="sealed" aria-labelledby="envelope-title" aria-hidden="true" inert>
-      <div class="envelope-scene content-narrow">
-        <h2 id="envelope-title">A little something from me.</h2>
+    <section class="scene scene-envelope" id="sealed" data-scene="1" aria-labelledby="envelope-title" aria-hidden="true" inert>
+      <div class="envelope-stage">
+        <h2 id="envelope-title" class="envelope-heading">From me, to you.</h2>
+        <img class="art envelope-companion" src="https://media.tenor.com/R5hcw0c8l_sAAAAe/peachcat-peachcat-and-goma.png"
+          data-fallback="./assets/peach-goma.webp" width="498" height="498" referrerpolicy="no-referrer" loading="lazy"
+          alt="Peach wrapping Goma in a little hug">
+
         <div class="envelope" id="envelope">
           <div class="envelope-back" aria-hidden="true"></div>
           <div class="envelope-flap" aria-hidden="true"></div>
           <div class="envelope-wax" aria-hidden="true">♡</div>
-          <button class="folded-letter" type="button" id="folded-letter" aria-label="Tuck the letter back in the envelope" disabled>
-            <span class="folded-line">for you, love</span>
-            <span class="folded-inner">
-              <span class="folded-salutation">My love,</span>
-              <span>I'm sorry I made it so hard for you to feel heard.</span>
-              <span class="folded-signature">♡</span>
-            </span>
-          </button>
+
+          <!-- The actual, complete letter is the paper that rises out of the envelope.
+               It is not a preview and is never duplicated into another scene. -->
+          <div class="letter-paper" id="letter-paper" role="region" tabindex="-1"
+               aria-label="My full apology letter; scroll down to read it" aria-hidden="true">
+            <article class="parchment" id="parchment">
+              <div class="parchment-top" aria-hidden="true"></div>
+              <div class="letter-text">
+                <p class="letter-hello">Hey, love,</p>
+                <p>I've been trying to find the right words, but I think I should start with the simplest ones. I'm sorry.</p>
+                <p>When you told me what you were feeling, I should have listened. Instead, there were times I took your words as something I needed to defend myself against. I was so caught up in how I felt that I didn't give you the patience or understanding you were asking for.</p>
+
+                <figure class="letter-illustration">
+                  <img src="https://media.tenor.com/7Qz2iamu4egAAAAi/peach-goma-sad-tears.gif"
+                       data-fallback="./assets/peach-goma.webp" referrerpolicy="no-referrer"
+                       width="500" height="500" loading="lazy" alt="Peach looking sad, with tears in her eyes">
+                </figure>
+
+                <p>That wasn't fair. You were trying to be honest with someone who should make it safe for you to do that. I made those conversations more exhausting than they needed to be. I know that being heard shouldn't have been something you had to keep fighting for.</p>
+                <p>I also heard what you said about feeling like you were the only one putting effort into us. I don't want to brush that aside or tell you that I care as though saying it proves anything. I can see how my actions have made it harder for you to feel that we're facing things together.</p>
+
+                <figure class="letter-illustration letter-illustration-wide">
+                  <img src="https://media.tenor.com/Ca7voVE7eoUAAAAC/peachcat-peachcat-and-goma.gif"
+                       data-fallback="./assets/peach-goma.webp" referrerpolicy="no-referrer"
+                       width="498" height="498" loading="lazy" alt="Goma comforting a tearful Peach">
+                </figure>
+
+                <p>I've leaned on my insecurity as an explanation for my reactions. It may explain where some of those feelings come from, but it doesn't excuse the way I've treated you. Those are things I need to work through without making you carry them for me.</p>
+                <p>I want to learn to sit with an uncomfortable conversation without immediately trying to win it. If I misunderstand you, I can ask instead of assuming. When I get defensive, I need to notice it, be accountable, and return to the conversation with care. I want to put in effort when life is ordinary, too, not only when I'm afraid of losing something.</p>
+
+                <figure class="letter-illustration">
+                  <img src="https://media1.tenor.com/m/SnuIjjNClm4AAAAC/peach-goma.gif"
+                       data-fallback="./assets/peach-goma.webp" referrerpolicy="no-referrer"
+                       width="498" height="498" loading="lazy" alt="Peach hugging Goma from behind">
+                </figure>
+
+                <p>I'm not writing this because I expect everything to be okay after you read it. This website doesn't change the past, and I don't want to make an apology into another thing you have to comfort me about.</p>
+                <p>I love you. I want you to feel safe telling me what matters to you. More than that, I want to become someone who listens closely enough that you don't have to repeat the same hurt over and over.</p>
+
+                <figure class="letter-illustration letter-illustration-small">
+                  <img src="https://media.tenor.com/qSGlyWc8uv8AAAAi/peach-goma-kiss-peach-and-goma.gif"
+                       data-fallback="./assets/peach-goma.webp" referrerpolicy="no-referrer"
+                       width="500" height="500" loading="lazy" alt="Peach and Goma embracing beneath a little heart">
+                </figure>
+
+                <p>You don't have to forgive me right away, or respond before you're ready. I just wanted to acknowledge what you've been telling me, and take responsibility for the part I've played in making things difficult between us.</p>
+                <p>I'm sorry for making you feel alone in something that's meant to be shared by both of us.</p>
+                <p class="letter-signoff">With love,<span>me ♡</span></p>
+                <figure class="letter-illustration letter-illustration-end">
+                  <img src="https://media.tenor.com/zBljNGMfvlAAAAAe/couple-tear.png"
+                       data-fallback="./assets/peach-goma.webp" referrerpolicy="no-referrer"
+                       width="512" height="512" loading="lazy" alt="Peach and Goma sharing a comforting hug">
+                </figure>
+                <button type="button" id="last-heart" class="last-heart" aria-label="Read the last message"><span aria-hidden="true">♡</span></button>
+              </div>
+              <div class="parchment-end" aria-hidden="true"></div>
+            </article>
+          </div>
           <div class="envelope-pocket" aria-hidden="true"></div>
-          <button class="envelope-cover" id="envelope-cover" type="button" aria-label="Open the envelope" aria-expanded="false"></button>
+          <button type="button" class="envelope-cover" id="envelope-cover"
+                  aria-label="Open the envelope" aria-expanded="false"></button>
         </div>
-        <p class="envelope-under" id="envelope-under">I've wanted to say this properly.</p>
       </div>
     </section>
 
-    <section class="scene" data-scene="2" id="the-hurt" aria-labelledby="hurt-title" aria-hidden="true" inert>
-      <div class="reflection content-narrow">
-        <div class="reflection-words">
-          <h2 id="hurt-title">I wasn't listening.</h2>
-          <p>You were trying to tell me what you needed. Instead of understanding, I became defensive and made you explain yourself even more.</p>
-          <p>I know I've made it feel as though you were carrying the effort between us on your own. That isn't fair to you.</p>
-          <p>I'm sorry.</p>
-        </div>
-        <img class="art art-reflection" src="https://media.tenor.com/0D5fTCGQzZIAAAAe/sending-hugs.png"
-          data-fallback="./assets/peach-goma.webp" referrerpolicy="no-referrer"
-          width="498" height="406" loading="lazy"
-          alt="Peach and Goma hugging with a heart and the word sorry">
-      </div>
-    </section>
-
-    <section class="scene" data-scene="3" id="what-changes" aria-labelledby="change-title" aria-hidden="true" inert>
-      <div class="promises content-narrow">
-        <h2 id="change-title">I understand more now.</h2>
-        <div class="promise-prose">
-          <p>My insecurity is something I have to manage. It shouldn't make it harder for you to be honest with me. I'll pause when I feel myself becoming defensive, rather than putting you through another argument.</p>
-          <p>Listening means giving your feelings room before trying to explain mine. I'll ask what you need, remember what you've told me, and take responsibility when I fall short.</p>
-          <p>You've needed more consistent effort from me. I want to show that through ordinary, thoughtful actions, without waiting until something is wrong.</p>
-        </div>
-        <p class="promise-last">I know these changes need to be lived, not just written.</p>
-      </div>
-    </section>
-
-    <section class="scene letter-scene" data-scene="4" id="the-letter" aria-labelledby="letter-title" aria-hidden="true" inert>
-      <div class="parchment-arrangement">
-        <h2 id="letter-title" class="visually-hidden">My letter to you</h2>
-        <div class="parchment-viewport" id="parchment-scroll" tabindex="0" role="region" aria-label="My apology letter. Scroll to read the entire letter.">
-          <article class="parchment">
-            <div class="parchment-top" aria-hidden="true"></div>
-            <div class="letter-text">
-              <p class="letter-hello">Hey, love,</p>
-              <p>I've been trying to find the right words, but I think I should start with the simplest ones. I'm sorry.</p>
-              <p>When you told me what you were feeling, I should have listened. Instead, there were times I took your words as something I needed to defend myself against. I was so caught up in how I felt that I didn't give you the patience or understanding you were asking for.</p>
-              <p>That wasn't fair. You were trying to be honest with someone who should make it safe for you to do that. I made those conversations more exhausting than they needed to be. I know that being heard shouldn't have been something you had to keep fighting for.</p>
-
-              <figure class="margin-illustration">
-                <img src="https://media.tenor.com/zBljNGMfvlAAAAAe/couple-tear.png"
-                  data-fallback="./assets/peach-goma.webp" referrerpolicy="no-referrer" width="512" height="512" loading="lazy"
-                  alt="Peach and Goma sharing a comforting hug">
-              </figure>
-
-              <p>I also heard what you said about feeling like you were the only one putting effort into us. I don't want to brush that aside or tell you that I care as though saying it proves anything. I can see how my actions have made it harder for you to feel that we're facing things together.</p>
-              <p>I've leaned on my insecurity as an explanation for my reactions. It may explain where some of those feelings come from, but it doesn't excuse the way I've treated you. Those are things I need to work through without making you carry them for me.</p>
-              <p>I want to learn to sit with an uncomfortable conversation without immediately trying to win it. If I misunderstand you, I can ask instead of assuming. When I get defensive, I need to notice it, be accountable, and return to the conversation with care. I want to put in effort when life is ordinary, too, not only when I'm afraid of losing something.</p>
-              <p>I'm not writing this because I expect everything to be okay after you read it. This website doesn't change the past, and I don't want to make an apology into another thing you have to comfort me about.</p>
-              <p>I love you. I want you to feel safe telling me what matters to you. More than that, I want to become someone who listens closely enough that you don't have to repeat the same hurt over and over.</p>
-              <p>You don't have to forgive me right away, or respond before you're ready. I just wanted to acknowledge what you've been telling me, and take responsibility for the part I've played in making things difficult between us.</p>
-              <p>I'm sorry for making you feel alone in something that's meant to be shared by both of us.</p>
-              <div class="letter-signoff">With love,<br>me ♡</div>
-            </div>
-            <div class="parchment-last" aria-hidden="true"></div>
-          </article>
-        </div>
-        <button type="button" class="closing-mark" id="closing-mark" aria-label="Continue to the final message">
-          <span aria-hidden="true">♡</span>
-        </button>
-      </div>
-    </section>
-
-    <section class="scene" data-scene="5" id="one-last-thing" aria-labelledby="ending-title" aria-hidden="true" inert>
-      <div class="ending content-narrow">
-        <img class="art art-ending" src="https://media.tenor.com/zBljNGMfvlAAAAAe/couple-tear.png"
-          data-fallback="./assets/peach-goma.webp" referrerpolicy="no-referrer"
-          width="512" height="512" loading="lazy" alt="Peach and Goma embracing gently">
+    <section class="scene" id="one-last-thing" data-scene="2" aria-labelledby="ending-title" aria-hidden="true" inert>
+      <div class="ending">
+        <img class="art art-ending" src="https://media.tenor.com/0D5fTCGQzZIAAAAe/sending-hugs.png"
+             data-fallback="./assets/peach-goma.webp" referrerpolicy="no-referrer"
+             width="498" height="406" loading="lazy" alt="Peach and Goma sharing a reassuring embrace">
         <h2 id="ending-title">I love you.</h2>
         <p>I know that what matters now is how I treat you, long after this letter is closed.</p>
         <p>Thank you for telling me how you feel, even when I haven't made it easy.</p>
@@ -123,10 +112,9 @@
       </div>
     </section>
   </main>
-
-  <nav class="accessible-navigation" aria-label="Move between scenes">
-    <button id="previous-scene" type="button" aria-label="Previous scene">Previous scene</button>
-    <button id="next-scene" type="button" aria-label="Next scene">Next scene</button>
+  <nav class="accessible-navigation" aria-label="Reading controls">
+    <button id="previous-scene" type="button" aria-label="Go back">Go back</button>
+    <button id="next-scene" type="button" aria-label="Move forward">Move forward</button>
   </nav>
   <div id="status" class="visually-hidden" role="status" aria-live="polite"></div>
 </body>
