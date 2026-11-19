@@ -55,7 +55,8 @@ test("the paper scrolls continuously until its real sign-off and ending", async 
   await expect(page.locator("#last-heart")).toBeVisible();
   await page.screenshot({path:test.info().outputPath("parchment-end.png"),fullPage:false});
   await page.locator("#last-heart").click();
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/);
+  await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
 });
 
 test("swiping through the paper does not prematurely leave the apology", async ({page}) => {
@@ -70,7 +71,8 @@ test("swiping through the paper does not prematurely leave the apology", async (
   await expect(page.locator("#sealed")).toHaveClass(/is-current/);
   await paper.evaluate(el => {el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
   await page.locator("#last-heart").click();
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/);
+  await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
 });
 
 test("the envelope can fold back without destroying or duplicating the letter", async ({page}) => {
@@ -248,10 +250,12 @@ test("the letter physically extracts before unfolding and refolds before inserti
   await expect(page.locator("#letter-paper")).toHaveAttribute("aria-hidden","false");
   await page.locator("#letter-paper").evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
   await page.locator("#last-heart").click();
-  await expect(env).toHaveClass(/is-refolding/);
-  await expect(env).toHaveClass(/is-inserting/,{timeout:3400});
-  await expect(env).toHaveClass(/is-sealing/,{timeout:3400});
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:4000});
+  await expect(env).toHaveClass(/is-heartburst/);
+  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(48);
+  await expect(env).toHaveClass(/is-refolding/,{timeout:3300});
+  await expect(env).toHaveClass(/is-inserting/,{timeout:3300});
+  await expect(env).toHaveClass(/is-sealing/,{timeout:3300});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7000});
   await expect(env).not.toHaveClass(/is-open/);
 });
 
@@ -263,9 +267,10 @@ test("the only visible way forward from the completed letter is its final heart"
   await page.keyboard.press("ArrowRight");
   await expect(page.locator("#sealed")).toHaveClass(/is-current/);
   await paper.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
-  await expect(page.locator("#last-heart")).toHaveAttribute("aria-label","Fold the letter and read the last message");
+  await expect(page.locator("#last-heart")).toHaveAttribute("aria-label","Send a burst of hearts, fold the letter, and read the last message");
   await page.locator("#last-heart").click();
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:4200});
+  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(48);
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
 });
 
 test("Ash's three original flowers bloom within the parchment", async ({page}) => {
@@ -322,4 +327,109 @@ test("jumping directly to the end reveals the flowers rather than an empty area"
   expect(parseFloat(shapes.stem)).toBe(0);
   expect(parseFloat(shapes.petals)).toBe(1);
   await page.screenshot({path:test.info().outputPath("flowers-at-letter-end.png"),fullPage:false});
+});
+
+
+test("three Ash flowers form a wrapped bouquet, with instantly visible stems and leaves", async ({page}) => {
+  await openTheActualLetter(page);
+  const garden=page.locator("#letter-paper .paper-garden");
+  await expect(garden.locator(".garden-flower")).toHaveCount(3);
+  await expect(garden.locator(".bouquet-wrap")).toHaveCount(1);
+  await expect(garden.locator(".bouquet-ribbon")).toHaveCount(1);
+  await expect(garden.locator(".garden-flower-1")).toHaveAttribute("transform",/rotate\(-19/);
+  await expect(garden.locator(".garden-flower-3")).toHaveAttribute("transform",/rotate\(18/);
+  const prep=await garden.evaluate(el=>({
+    stem:getComputedStyle(el.querySelector(".garden-stem")).strokeDashoffset,
+    leaves:getComputedStyle(el.querySelector(".garden-leaf")).opacity,
+    petals:getComputedStyle(el.querySelector(".garden-petals")).opacity
+  }));
+  expect(parseFloat(prep.stem)).toBe(0);
+  expect(parseFloat(prep.leaves)).toBe(1);
+  expect(parseFloat(prep.petals)).toBeGreaterThan(.2);
+  await garden.scrollIntoViewIfNeeded();
+  await expect(garden).toHaveClass(/is-blooming/);
+  await page.screenshot({path:test.info().outputPath("bouquet.png"),fullPage:false});
+});
+
+test("ambient petals fall constantly behind scenes, and stop for reduced-motion users", async ({page}) => {
+  await page.goto("/");
+  const flakes=page.locator(".ambient-petals i");
+  await expect(flakes).toHaveCount(18);
+  const data=await flakes.first().evaluate(el=>({
+    name:getComputedStyle(el).animationName,
+    iteration:getComputedStyle(el).animationIterationCount,
+    background:getComputedStyle(el).backgroundColor
+  }));
+  expect(data.name).toContain("ambientPetalFall");
+  expect(data.iteration).toBe("infinite");
+  expect(data.background).not.toBe("rgba(0, 0, 0, 0)");
+  await page.emulateMedia({reducedMotion:"reduce"});
+  const stilled=await flakes.first().evaluate(el=>getComputedStyle(el).animationName);
+  expect(stilled).toBe("none");
+});
+
+test("the folded paper hides writing from extraction through insertion", async ({page}) => {
+  await page.goto("/");
+  await page.locator("#start-reading").click();
+  const envelope=page.locator("#envelope");
+  const text=page.locator("#parchment");
+  await page.locator("#envelope-cover").click();
+  await expect(envelope).toHaveClass(/is-extracting/);
+  await expect(text).toHaveCSS("visibility","hidden");
+  await expect(envelope).toHaveClass(/is-unfolding/,{timeout:3600});
+  await expect(text).toHaveCSS("visibility","hidden");
+  await expect(envelope).toHaveClass(/is-reading/,{timeout:3600});
+  await expect(text).toHaveCSS("visibility","visible");
+  await page.locator("#letter-paper").evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
+  await page.locator("#last-heart").click();
+  await expect(envelope).toHaveClass(/is-heartburst/);
+  await expect(text).toHaveCSS("visibility","visible");
+  await expect(envelope).toHaveClass(/is-refolding/,{timeout:3300});
+  await expect(text).toHaveCSS("visibility","hidden");
+  await expect(envelope).toHaveClass(/is-inserting/,{timeout:3300});
+  await expect(text).toHaveCSS("visibility","hidden");
+});
+
+test("the compact sheet stays within the pink envelope during insertion", async ({page}) => {
+  await openTheActualLetter(page);
+  const paper=page.locator("#letter-paper");
+  await paper.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
+  await page.locator("#last-heart").click();
+  const envelope=page.locator("#envelope");
+  await expect(envelope).toHaveClass(/is-inserting/,{timeout:5000});
+  await page.waitForTimeout(500);
+  const m=await page.evaluate(()=>{
+    const rect=s=>document.querySelector(s).getBoundingClientRect();
+    const sheet=rect("#letter-paper");
+    const pocket=rect(".envelope-pocket");
+    return {sheetBottom:sheet.bottom,pocketBottom:pocket.bottom,paperHeight:sheet.height,
+      paperZ:getComputedStyle(document.querySelector("#letter-paper")).zIndex,
+      pocketZ:getComputedStyle(document.querySelector(".envelope-pocket")).zIndex};
+  });
+  expect(m.sheetBottom).toBeLessThanOrEqual(m.pocketBottom+2);
+  expect(m.paperHeight).toBeLessThan(140);
+  expect(Number(m.paperZ)).toBeLessThan(Number(m.pocketZ));
+  await page.screenshot({path:test.info().outputPath("letter-reinserting.png"),fullPage:false});
+});
+
+test("the heart finale emits a large burst before any folding or scene transition", async ({page}) => {
+  await openTheActualLetter(page);
+  const paper=page.locator("#letter-paper");
+  await paper.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
+  await page.locator("#last-heart").click();
+  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(48);
+  await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
+  await expect(page.locator("#sealed")).toHaveClass(/is-current/);
+  const burst=await page.locator("#heart-burst .heart-particle").first().evaluate(el=>({
+    emoji:el.textContent,
+    style:getComputedStyle(el).animationName
+  }));
+  expect(burst.emoji.length).toBeGreaterThan(0);
+  expect(burst.style).toContain("heartFlutter");
+  await page.screenshot({path:test.info().outputPath("heart-burst.png"),fullPage:false});
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:3300});
+  await expect(page.locator("#one-last-thing")).not.toHaveClass(/is-current/);
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
+  await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(0);
+  await expect(page.locator(".ending-flowers span")).toHaveCount(3);
 });
