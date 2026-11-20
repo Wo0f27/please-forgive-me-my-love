@@ -1,3 +1,62 @@
+test("personal Taglish letter is preserved verbatim with the correct signoff", async ({page}) => {
+  await page.goto("/");
+  const paras=await page.locator("#letter-paper .letter-text > p").allTextContents();
+  expect(paras[0]).toBe("My Love,");
+  expect(paras[1]).toBe("It was a bit tough to begin this as we've talked about it before, even then I had a hard time putting my thoughts into words so I guess I'll begin with I'm sorry.");
+  expect(paras[2]).toContain("I guess masyado akong nasanay that I have to defend myself on anything that I felt that's against me..");
+  expect(paras[4]).toContain("you basically had to audit our relationship on your own.. Im sorry you felt alone..");
+  expect(paras[6]).toContain("Honestly ganito sana gagawin ko next week, send you basically 4 different things like this");
+  expect(paras[9]).toBe("I'm sorry for making you feel alone in something that's meant to be shared by both of us.");
+  expect(paras[10]).toBe("With love,Your Woof");
+});
+
+test("background song is muted by default, may be unmuted explicitly, and stops at finale", async ({page}) => {
+  await page.goto("/");
+  const audio=page.locator("#letter-music");
+  const toggle=page.locator("#music-toggle");
+  await expect(audio).toHaveAttribute("muted","");
+  await expect(audio).toHaveAttribute("loop","");
+  await expect(audio).toHaveAttribute("src","./assets/music/first-snowflakes.m4a");
+  await expect(toggle).toBeHidden();
+  await page.locator("#start-reading").click();
+  await expect(toggle).toBeHidden();
+  await page.locator("#envelope-cover").click();
+  await expect(page.locator("#envelope")).toHaveClass(/is-reading/,{timeout:4500});
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveText("♫ Music muted");
+  await expect.poll(()=>audio.evaluate(el=>el.muted)).toBe(true);
+  await expect.poll(()=>audio.evaluate(el=>!el.paused),{timeout:5000}).toBe(true);
+  await toggle.click();
+  await expect(toggle).toHaveText("♫ Music on");
+  await expect.poll(()=>audio.evaluate(el=>el.muted)).toBe(false);
+  await toggle.click();
+  await expect(toggle).toHaveText("♫ Music muted");
+  await expect.poll(()=>audio.evaluate(el=>el.muted)).toBe(true);
+  await page.locator("#letter-paper").evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
+  await page.locator("#last-heart").click();
+  await expect(toggle).toBeHidden();
+  await expect.poll(()=>audio.evaluate(el=>el.paused)).toBe(true);
+  await expect(page.locator(".envelope-stage")).toHaveClass(/is-finale-bouquet/);
+  await expect(page.locator(".envelope-companion")).toHaveCSS("visibility","hidden");
+  await expect(page.locator("#finale-bouquet-layer .paper-garden")).toBeVisible();
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:3500});
+  await expect(page.locator(".envelope-stage")).not.toHaveClass(/is-finale-bouquet/);
+});
+
+test("closing the letter early stops music, and reopening starts muted again", async ({page}) => {
+  await openTheActualLetter(page);
+  const audio=page.locator("#letter-music");
+  await expect.poll(()=>audio.evaluate(el=>el.muted)).toBe(true);
+  await page.locator("#music-toggle").click();
+  await expect.poll(()=>audio.evaluate(el=>el.muted)).toBe(false);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#envelope")).not.toHaveClass(/is-open/,{timeout:4500});
+  await expect.poll(()=>audio.evaluate(el=>el.paused && el.muted)).toBe(true);
+  await page.locator("#envelope-cover").click();
+  await expect(page.locator("#envelope")).toHaveClass(/is-reading/,{timeout:4500});
+  await expect.poll(()=>audio.evaluate(el=>el.muted)).toBe(true);
+});
+
 const { test, expect } = require("@playwright/test");
 
 async function openTheActualLetter(page) {
@@ -13,7 +72,7 @@ test("the full letter exists only inside the envelope", async ({page}) => {
   await expect(page.locator(".scene")).toHaveCount(3);
   await expect(page.locator(".scene.letter-scene,.site-header,.site-nav,.nav-arrow,.chapter-dots")).toHaveCount(0);
   await expect(page.locator("#sealed #letter-paper article.parchment")).toHaveCount(1);
-  await expect(page.locator("#letter-paper .letter-text > p")).toHaveCount(12);
+  await expect(page.locator("#letter-paper .letter-text > p")).toHaveCount(11);
   await expect(page.locator("img")).toHaveCount(8);
   const sources = await page.locator("img").evaluateAll(els => els.map(el => el.getAttribute("src")));
   expect(new Set(sources).size).toBeGreaterThanOrEqual(4);
@@ -132,7 +191,8 @@ test("landing page respects My Love greeting, transparent animated sticker and r
   });
   expect(alpha).toBeLessThanOrEqual(1);
   await expect(page.locator("#start-reading")).toHaveCSS("border-radius","8px");
-  await expect(page.locator("#start-reading")).toHaveAttribute("aria-label","Open the letter");
+  await expect(page.locator("#start-reading")).toHaveAttribute("aria-label","Please read this...");
+  await expect(page.locator("#start-reading .button-text")).toHaveText("Please read this...");
   const gradient=await page.locator(".room").evaluate(el=>getComputedStyle(el).backgroundImage);
   expect(gradient).toContain("radial-gradient");
   await expect(page.locator("#letter-paper .letter-hello")).toHaveText("My Love,");
@@ -590,7 +650,8 @@ test("closing page shows only the fireworks question and two choices", async ({p
   await expect(page.locator("#ending-title")).toHaveText("Will you go with me to watch the fireworks tomorrow?");
   await expect(page.locator("#invite-yes")).toHaveText("Yes");
   await expect(page.locator("#invite-no")).toHaveText("No");
-  await expect(page.locator("#one-last-thing p")).toHaveCount(0);
+  await expect(page.locator("#one-last-thing p")).toHaveCount(1);
+  await expect(page.locator(".invite-signature")).toHaveText("- Your Woof");
   await expect(page.locator(".invite-event,.invite-privacy,.invite-answer,.invite-window-bar,.ending-flowers")).toHaveCount(0);
   await expect(page.locator("#invite-heart-result")).toHaveAttribute("aria-hidden","true");
   await expect(page.locator("#invite-heart-result")).toContainText("i love you");
