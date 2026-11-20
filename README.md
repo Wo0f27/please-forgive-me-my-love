@@ -4,6 +4,14 @@ A cozy Peach and Goma apology website hosted on GitHub Pages.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
+## Version 15 — longer bouquet offering and farewell heart
+
+- The final letter heart launches the existing emoji shower and bouquet construction. After the flower animation completes, the overlay displays **"please take these flowers for you"** beneath the bouquet.
+- The completed bouquet and dedication remain on screen for **five full seconds** before the existing refolding, envelope insertion, sealing and invitation sequence resumes. The temporary suppression of Peach/Goma artwork during the offering remains intact, then restores when refolding begins.
+- Reduced-motion visitors see the completed bouquet and dedication immediately and receive the same five-second pause.
+- The final **Yes** choice still merges both buttons into the pink heart; its two-line message is now **"see you soon, iloveyou"**. The playful **No** hopping behavior is unchanged.
+- The exact personal apology, local audio file and muted-by-default music preference are unchanged.
+
 ## Version 14 — final personalized letter, music and bouquet staging
 
 - Replaced the apology text with the user's own **exact Taglish letter**, preserving its original word choices, punctuation and paragraphs; the signoff is **With love, Your Woof**.
