@@ -971,3 +971,37 @@ body{background:#fff1e9;color:var(--text)}
     opacity:1!important;transform:none!important;animation:none!important;
   }
 }
+
+
+/* V14: hide the Peach/Goma companion and letter sticker art only during
+   bouquet creation, then restore them as the refolding animation begins. */
+.envelope-stage.is-finale-bouquet .animated-sticker{visibility:hidden!important}
+.invite-signature{
+  margin:3px auto 0!important;
+  color:#925672!important;
+  font:italic 500 clamp(15px,3.5vw,19px)/1.4 Georgia,serif;
+  text-align:center;
+}
+.music-toggle{
+  position:absolute;
+  right:clamp(8px,3vw,22px);
+  top:clamp(8px,2.5vh,20px);
+  z-index:35;
+  border:1px solid #d2a4b6;
+  border-radius:999px;
+  padding:8px 12px;
+  min-height:40px;
+  background:#fff8f2eb;
+  box-shadow:0 3px 12px #a06a872b;
+  color:#82566c;
+  font:500 12px/1.2 system-ui,sans-serif;
+  cursor:pointer;
+}
+.music-toggle[hidden]{display:none!important}
+.music-toggle:focus-visible{outline:3px solid #925672;outline-offset:3px}
+@media(max-width:420px){
+  .music-toggle{right:8px;top:6px;font-size:11px;padding:7px 9px}
+}
+@media(max-height:530px) and (orientation:landscape){
+  .music-toggle{top:3px;right:5px;min-height:34px}
+}
