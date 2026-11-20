@@ -1,4 +1,4 @@
-/* A Little Letter — v13
+/* A Little Letter — v14
    One letter with distinct extracting, unfolding, reading, refolding and
    reinserting phases. The final tap finishes the physical letter before
    opening the closing scene. No navigation bar or artificial page breaks. */
@@ -18,6 +18,8 @@
   const heartLayer = document.getElementById("heart-burst");
   const garden = document.querySelector("[data-bloom-scene]");
   const finaleBouquetLayer = document.getElementById("finale-bouquet-layer");
+  const letterMusic = document.getElementById("letter-music");
+  const musicToggle = document.getElementById("music-toggle");
   const invitationYes = document.getElementById("invite-yes");
   const invitationNo = document.getElementById("invite-no");
   const invitationArea = document.getElementById("invite-play-area");
@@ -34,6 +36,38 @@
   let invitationEffectToken = 0;
   let noHopCount = 0;
   let invitationAccepted = false;
+  let musicStarted = false;
+
+  // Sound remains off by default; a deliberate tap is required to hear it.
+  letterMusic.muted = true;
+  function stopMusic() {
+    letterMusic.pause();
+    letterMusic.currentTime = 0;
+    letterMusic.muted = true;
+    musicStarted = false;
+    musicToggle.hidden = true;
+    musicToggle.setAttribute("aria-pressed","false");
+    musicToggle.setAttribute("aria-label","Unmute the background music");
+    musicToggle.textContent = "♫ Music muted";
+  }
+  function startMusic() {
+    if (musicStarted) return;
+    musicStarted = true;
+    letterMusic.muted = true;
+    musicToggle.hidden = false;
+    const playPromise = letterMusic.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => { musicToggle.textContent = "♫ Tap to play"; });
+    }
+  }
+  musicToggle.addEventListener("click", () => {
+    if (!musicStarted) return;
+    letterMusic.muted = !letterMusic.muted;
+    musicToggle.setAttribute("aria-pressed",String(!letterMusic.muted));
+    musicToggle.setAttribute("aria-label",letterMusic.muted ? "Unmute the background music" : "Mute the background music");
+    musicToggle.textContent = letterMusic.muted ? "♫ Music muted" : "♫ Music on";
+    if (letterMusic.paused) letterMusic.play().catch(() => {});
+  });
 
   const durations = {
     extract: 710, unfold: 620, expand: 640, heartBurst: 2150,
@@ -88,7 +122,7 @@
     old.setAttribute("aria-hidden","true");
     old.inert = true;
     const upcoming = scenes[index];
-    if (index === 2) resetInvitation();
+    if (index === 2) { resetInvitation(); stopMusic(); }
     upcoming.classList.remove("was-before","was-after");
     upcoming.classList.add("is-current");
     upcoming.removeAttribute("aria-hidden");
@@ -141,6 +175,7 @@
         schedule(() => {
           phase = "reading";
           syncEnvelope();
+          startMusic();
           announce("Your letter is ready to read.");
           schedule(() => {
             if (phase === "reading") {
@@ -207,7 +242,9 @@
     if (phase !== "reading" || !readingAtEnd()) return;
     cancelSequence();
     phase = "heartburst";
+    stopMusic();
     syncEnvelope();
+    envelopeStage.classList.add("is-finale-bouquet");
     createFinaleBouquet();
     burstHearts();
     announce("A bouquet of flowers and lots of love for you.");
@@ -215,6 +252,7 @@
       heartLayer.replaceChildren();
       finaleBouquetLayer.classList.remove("is-showing");
       finaleBouquetLayer.replaceChildren();
+      envelopeStage.classList.remove("is-finale-bouquet");
       phase = "reading";
       syncEnvelope();
       closeEnvelope(true);
@@ -326,6 +364,8 @@
     if (phase !== "reading") return;
     cancelSequence();
     rememberedScrollTop = paper.scrollTop;
+    stopMusic();
+    envelopeStage.classList.remove("is-finale-bouquet");
     envelopeStage.classList.toggle("is-finishing",advanceToEnding);
     phase = "refolding";
     syncEnvelope();
