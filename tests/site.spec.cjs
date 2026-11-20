@@ -41,7 +41,7 @@ test("background song is muted by default, may be unmuted explicitly, and stops 
   await expect(page.locator(".envelope-stage")).toHaveClass(/is-finale-bouquet/);
   await expect(page.locator(".envelope-companion")).toHaveCSS("visibility","hidden");
   await expect(page.locator("#finale-bouquet-layer .paper-garden")).toBeVisible();
-  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:3500});
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:10000});
   await expect(page.locator(".envelope-stage")).not.toHaveClass(/is-finale-bouquet/);
 });
 
@@ -116,7 +116,7 @@ test("the paper scrolls continuously until its real sign-off and ending", async 
   await page.screenshot({path:test.info().outputPath("parchment-end.png"),fullPage:false});
   await page.locator("#last-heart").click();
   await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
 });
 
 test("swiping through the paper does not prematurely leave the apology", async ({page}) => {
@@ -132,7 +132,7 @@ test("swiping through the paper does not prematurely leave the apology", async (
   await paper.evaluate(el => {el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
   await page.locator("#last-heart").click();
   await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
 });
 
 test("the envelope can fold back without destroying or duplicating the letter", async ({page}) => {
@@ -231,7 +231,7 @@ test("Escape refolds and reinserts the paper; reopening restores scroll progress
   const before=await paper.evaluate(el=>el.scrollTop);
   expect(before).toBeGreaterThan(100);
   await page.keyboard.press("Escape");
-  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/);
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:10000});
   await expect(page.locator("#envelope")).toHaveClass(/is-inserting/,{timeout:4500});
   await expect(page.locator("#envelope")).not.toHaveClass(/is-open/,{timeout:4500});
   await expect(page.locator("#letter-paper")).toHaveAttribute("aria-hidden","true");
@@ -313,10 +313,10 @@ test("the letter physically extracts before unfolding and refolds before inserti
   await page.locator("#last-heart").click();
   await expect(env).toHaveClass(/is-heartburst/);
   await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(64);
-  await expect(env).toHaveClass(/is-refolding/,{timeout:3300});
+  await expect(env).toHaveClass(/is-refolding/,{timeout:10000});
   await expect(env).toHaveClass(/is-inserting/,{timeout:3300});
   await expect(env).toHaveClass(/is-sealing/,{timeout:3300});
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7000});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
   await expect(env).not.toHaveClass(/is-open/);
 });
 
@@ -331,7 +331,7 @@ test("the only visible way forward from the completed letter is its final heart"
   await expect(page.locator("#last-heart")).toHaveAttribute("aria-label","Grow a bouquet, send hearts, fold the letter, and read the last message");
   await page.locator("#last-heart").click();
   await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(64);
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
 });
 
 test("the original three-flower artwork is hidden until the closing heart is pressed", async ({page}) => {
@@ -388,7 +388,49 @@ test("reduced motion shows the completed bouquet only after the heart is pressed
   expect(parseFloat(data.petals)).toBe(1);
   expect(parseFloat(data.wrap)).toBe(1);
   await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(12);
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
+});
+
+test("the bouquet dedication appears after creation and remains five seconds before refolding", async ({page}) => {
+  await openTheActualLetter(page);
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  const message=page.locator("#finale-bouquet-layer .bouquet-message");
+  await expect(message).toHaveText("please take these flowers for you");
+  await expect(message).toHaveCSS("opacity","0");
+  await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
+  await expect(message).toHaveCSS("opacity","1",{timeout:3500});
+  const start=Date.now();
+  await page.waitForTimeout(3800);
+  await expect(message).toBeVisible();
+  await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
+  await expect(page.locator(".envelope-stage")).toHaveClass(/is-finale-bouquet/);
+  await expect(page.locator(".envelope-companion")).toHaveCSS("visibility","hidden");
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:3500});
+  expect(Date.now()-start).toBeGreaterThanOrEqual(4600);
+  await expect(page.locator("#finale-bouquet-layer")).toBeEmpty();
+  await expect(page.locator(".envelope-stage")).not.toHaveClass(/is-finale-bouquet/);
+});
+
+test("reduced motion still holds the fully formed flowers and note five seconds", async ({page}) => {
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await openTheActualLetter(page);
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  const message=page.locator("#finale-bouquet-layer .bouquet-message");
+  await expect(message).toBeVisible({timeout:1200});
+  await expect(message).toHaveText("please take these flowers for you");
+  await page.waitForTimeout(3500);
+  await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
+  await expect(message).toBeVisible();
+  // In reduced motion, refolding transitions through its state immediately;
+  // observe the actual completed scene rather than polling a transient class.
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7000});
+  await expect(page.locator("#finale-bouquet-layer")).toBeEmpty();
 });
 
 test("the tap grows stems, leaves, petals and wrapper while hearts fly, then folding begins", async ({page}) => {
@@ -421,7 +463,7 @@ test("the tap grows stems, leaves, petals and wrapper while hearts fly, then fol
   expect(flower.wrap).toBeGreaterThan(.95);
   await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
   await page.screenshot({path:test.info().outputPath("heart-and-growing-bouquet.png"),fullPage:false});
-  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:2700});
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:10000});
   await expect(page.locator("#finale-bouquet-layer")).toBeEmpty();
 });
 
@@ -479,7 +521,7 @@ test("the folded paper hides writing from extraction through insertion", async (
   await page.locator("#last-heart").click();
   await expect(envelope).toHaveClass(/is-heartburst/);
   await expect(text).toHaveCSS("visibility","visible");
-  await expect(envelope).toHaveClass(/is-refolding/,{timeout:3300});
+  await expect(envelope).toHaveClass(/is-refolding/,{timeout:10000});
   await expect(text).toHaveCSS("visibility","hidden");
   await expect(envelope).toHaveClass(/is-inserting/,{timeout:3300});
   await expect(text).toHaveCSS("visibility","hidden");
@@ -491,7 +533,7 @@ test("the compact sheet stays within the pink envelope during insertion", async 
   await paper.evaluate(el=>{el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));});
   await page.locator("#last-heart").click();
   const envelope=page.locator("#envelope");
-  await expect(envelope).toHaveClass(/is-inserting/,{timeout:5000});
+  await expect(envelope).toHaveClass(/is-inserting/,{timeout:12000});
   await page.waitForTimeout(500);
   const m=await page.evaluate(()=>{
     const rect=s=>document.querySelector(s).getBoundingClientRect();
@@ -523,9 +565,9 @@ test("the heart finale emits a large burst before any folding or scene transitio
   expect(burst.emoji.length).toBeGreaterThan(0);
   expect(burst.style).toContain("heartFlutter");
   await page.screenshot({path:test.info().outputPath("heart-burst.png"),fullPage:false});
-  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:3300});
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:10000});
   await expect(page.locator("#one-last-thing")).not.toHaveClass(/is-current/);
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
   await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(0);
   await expect(page.locator("#finale-bouquet-layer")).toBeEmpty();
   await expect(page.locator("#ending-title")).toHaveText("Will you go with me to watch the fireworks tomorrow?");
@@ -558,7 +600,7 @@ test("refolding meets the envelope mouth rather than hovering above it", async (
   });
   await page.locator("#last-heart").click();
   const envelope=page.locator("#envelope");
-  await expect(envelope).toHaveClass(/is-refolding/,{timeout:2900});
+  await expect(envelope).toHaveClass(/is-refolding/,{timeout:10000});
   await page.waitForTimeout(500);
   const geometry=await page.evaluate(()=>{
     const p=document.querySelector("#letter-paper").getBoundingClientRect();
@@ -583,8 +625,8 @@ test("the final heart flurry remains playful but finishes before paper folding",
   await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
   const distances=await particles.evaluateAll(els=>els.map(el=>el.style.getPropertyValue("--heart-dx")));
   expect(new Set(distances).size).toBeGreaterThan(40);
-  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:3100});
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7000});
+  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:10000});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
   await expect(particles).toHaveCount(0);
 });
 
@@ -596,7 +638,7 @@ test("envelope heading and companion stay concealed until sealing finishes", asy
   });
   await page.locator("#last-heart").click();
   const heading=page.locator(".envelope-heading");
-  await expect(page.locator("#envelope")).toHaveClass(/is-inserting/,{timeout:4900});
+  await expect(page.locator("#envelope")).toHaveClass(/is-inserting/,{timeout:12000});
   await expect(heading).toHaveCSS("opacity","0");
   await expect(page.locator("#envelope")).toHaveClass(/is-sealing/,{timeout:1700});
   await expect(heading).toHaveCSS("opacity","0");
@@ -610,7 +652,7 @@ test("the envelope greeting never bleeds into the closing scene", async ({page})
     el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
   });
   await page.locator("#last-heart").click();
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7300});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
   await expect(page.locator(".envelope-stage")).toHaveClass(/is-finishing/);
   await expect(page.locator(".envelope-heading")).toHaveCSS("opacity","0");
   await expect(page.locator(".envelope-companion")).toHaveCSS("opacity","0");
@@ -655,7 +697,8 @@ test("closing page shows only the fireworks question and two choices", async ({p
   await expect(page.locator(".invite-signature")).toHaveText("- Your Woof");
   await expect(page.locator(".invite-event,.invite-privacy,.invite-answer,.invite-window-bar,.ending-flowers")).toHaveCount(0);
   await expect(page.locator("#invite-heart-result")).toHaveAttribute("aria-hidden","true");
-  await expect(page.locator("#invite-heart-result")).toContainText("i love you");
+  await expect(page.locator("#invite-heart-result")).toContainText("see you soon,");
+  await expect(page.locator("#invite-heart-result")).toContainText("iloveyou");
 });
 
 test("all eight visible stickers use full-resolution local animated WebP with static reduced-motion alternates", async ({page}) => {
@@ -747,7 +790,7 @@ async function reachFireworksInvitation(page) {
     el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
   });
   await page.locator("#last-heart").click();
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:9000});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
 }
 
 test("No hops away after each tap and stays inside the invitation on desktop and mobile", async ({page}) => {
@@ -783,7 +826,7 @@ test("No hops away after each tap and stays inside the invitation on desktop and
   await page.screenshot({path:test.info().outputPath("no-after-eight-taps.png"),fullPage:false});
 });
 
-test("Yes pulls both buttons together and turns into an i love you heart", async ({page}) => {
+test("Yes pulls both buttons together and turns into a see you soon heart", async ({page}) => {
   await reachFireworksInvitation(page);
   await page.waitForTimeout(760);
   const yes=page.locator("#invite-yes");
@@ -801,7 +844,7 @@ test("Yes pulls both buttons together and turns into an i love you heart", async
   await expect(area).toHaveClass(/is-heart/,{timeout:2500});
   await expect(page.locator("#invite-heart-result")).toHaveAttribute("aria-hidden","false");
   await expect(page.locator("#invite-heart-result")).toBeVisible();
-  await expect(page.locator("#invite-heart-result")).toHaveText("i love you");
+  await expect(page.locator("#invite-heart-result")).toHaveText(/see you soon,\s*iloveyou/);
   await expect(page.locator("#invite-sparkles .invite-sparkle")).toHaveCount(30);
   await page.waitForTimeout(530); // capture the settled heart, not its first frame
   const contrast=await page.locator("#invite-heart-result span").evaluate(el=>({
@@ -892,7 +935,7 @@ test("returning to the letter resets the invitation for a new visit", async ({pa
     el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
   });
   await page.locator("#last-heart").click();
-  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:9000});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:15000});
   await expect(page.locator("#invite-play-area")).not.toHaveClass(/is-heart|is-merging/);
   await expect(page.locator("#invite-yes")).toBeEnabled();
   await expect(page.locator("#invite-no")).toBeEnabled();

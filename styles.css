@@ -1005,3 +1005,50 @@ body{background:#fff1e9;color:var(--text)}
 @media(max-height:530px) and (orientation:landscape){
   .music-toggle{top:3px;right:5px;min-height:34px}
 }
+
+
+/* V15: the finished bouquet and its dedication hold for five full seconds.
+   The message sits below the flowers and never covers Peach/Goma artwork. */
+.finale-bouquet-layer{flex-direction:column;gap:clamp(8px,2vh,15px)}
+.finale-bouquet-layer .bouquet-message{
+  margin:0;
+  padding:8px 14px;
+  max-width:min(92vw,410px);
+  border-radius:18px;
+  color:#83526c;
+  background:#fff7f0ed;
+  box-shadow:0 4px 15px #b57b9440;
+  font:italic 600 clamp(16px,3.8vw,21px)/1.35 Georgia,serif;
+  text-align:center;
+  text-wrap:balance;
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .35s ease,transform .35s ease;
+}
+.finale-bouquet-layer.is-message-visible .bouquet-message{
+  opacity:1;
+  transform:translateY(0);
+}
+.invite-heart-result span{
+  width:94%;
+  white-space:normal;
+  font:700 clamp(19px,4.4vw,21px)/1.2 Georgia,serif;
+}
+@media(max-height:530px) and (orientation:landscape){
+  .finale-bouquet-layer{gap:5px}
+  .finale-bouquet-layer .paper-garden.is-final-bouquet{
+    width:min(220px,36vh);
+    max-height:44vh;
+  }
+  .finale-bouquet-layer .bouquet-message{
+    font-size:15px;
+    padding:5px 10px;
+  }
+  .invite-heart-result span{
+    font-size:17px;
+    width:96%;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .finale-bouquet-layer .bouquet-message{transition:none}
+}
