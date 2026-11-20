@@ -1,3 +1,5 @@
+const { test, expect } = require("@playwright/test");
+
 test("personal Taglish letter is preserved verbatim with the correct signoff", async ({page}) => {
   await page.goto("/");
   const paras=await page.locator("#letter-paper .letter-text > p").allTextContents();
@@ -57,7 +59,6 @@ test("closing the letter early stops music, and reopening starts muted again", a
   await expect.poll(()=>audio.evaluate(el=>el.muted)).toBe(true);
 });
 
-const { test, expect } = require("@playwright/test");
 
 async function openTheActualLetter(page) {
   await page.goto("/");
