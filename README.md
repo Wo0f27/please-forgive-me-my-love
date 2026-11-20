@@ -4,6 +4,12 @@ A cozy Peach and Goma apology website hosted on GitHub Pages.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
+## Version 13 — flowers bloom when the last heart is pressed
+
+The end-of-letter heart now starts **two effects together**: a wrapped bouquet grows visibly in the viewport and the existing 64-heart emoji burst launches. The bouquet is the same three-flower artwork originally drawn for the letter, now held as an invisible illustration template instead of blooming during reading. This avoids having the flowers already grown before the user presses the heart, or having them hidden above the viewport at the time of the tap.
+
+After approximately 2.15 seconds, both celebration overlays clear, then the approved physical sequence proceeds: refold, insert, seal, and finally show the fireworks question. Repeat taps are ignored while the sequence runs. Reduced-motion visitors see a fully formed bouquet without flower-growth motion and the existing 12 restrained hearts. No letter words, stickers, invitation wording or existing envelope structure were changed.
+
 ## Version 12 — playful fireworks question and merging heart
 
 The final screen is simplified to a single question and two buttons:
