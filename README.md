@@ -4,6 +4,18 @@ A cozy Peach and Goma apology website hosted on GitHub Pages.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
+## Version 11 — a private, phone-friendly fireworks invitation
+
+The closing scene now follows the reference video's **cute pink pop-up window** idea without adding a second envelope or obstructing the real apology letter. The user asked for a direct invitation to watch the fireworks together on Saturday, November 21, 2026, at SM City Pampanga (Amphitheatre). The event's published start is 6:00 PM; the exact fireworks ignition time is not stated separately.
+
+- Closing question: **"Will you go watch the fireworks with me tomorrow? ♡"**
+- Two full-size, stationary, accessible touch targets: **"Yes ♡"** and **"Not this time"**. Neither is intentionally elusive or manipulative.
+- Choosing Yes shows a small heart/sparkle celebration and a gentle acknowledgment. Choosing No shows a respectful acknowledgment without guilt or animation. The visitor can change their selection.
+- **Selections remain in the page only**: no messages are sent to the author, no network requests, analytics, cookies or local storage.
+- The local animation and floral palette are preserved. A CSS-only celebratory burst is disabled for users who prefer reduced motion.
+- Smartphone portrait layouts, 320px-wide phones, short screens, landscape and keyboard activation are tested. Buttons are at least 44px tall.
+- The previously removed "read it again" control stays absent. The former generic closing paragraphs are replaced by the direct invitation; the rest of the apology is unchanged.
+
 ## Version 10 — animated, high-quality Peach and Goma stickers
 
 The six illustration slots in the letter and closing scene now use **six distinct, locally hosted transparent animated WebP files** restored from the source GIFs rather than the first-frame PNG conversions. There are **eight animated placements** in total, including the landing and envelope companion. The original transparent user-provided PNG is retained in the repository as a fallback.
