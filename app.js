@@ -1,4 +1,4 @@
-/* A Little Letter — v14
+/* A Little Letter — v15
    One letter with distinct extracting, unfolding, reading, refolding and
    reinserting phases. The final tap finishes the physical letter before
    opening the closing scene. No navigation bar or artificial page breaks. */
@@ -70,7 +70,7 @@
   });
 
   const durations = {
-    extract: 710, unfold: 620, expand: 640, heartBurst: 2150,
+    extract: 710, unfold: 620, expand: 640, bouquetBloom: 1800, bouquetHold: 5000,
     refold: 660, insert: 550, seal: 630, finalHold: 160, settle: 80
   };
 
@@ -229,6 +229,11 @@
     bouquet.classList.remove("is-blooming","is-grown");
     bouquet.classList.add("is-final-bouquet");
     finaleBouquetLayer.appendChild(bouquet);
+    const message = document.createElement("p");
+    message.className = "bouquet-message";
+    message.textContent = "please take these flowers for you";
+    finaleBouquetLayer.appendChild(message);
+    finaleBouquetLayer.classList.remove("is-message-visible");
     finaleBouquetLayer.classList.add("is-showing");
     if (reducedMotion.matches) {
       bouquet.classList.add("is-created");
@@ -248,15 +253,23 @@
     createFinaleBouquet();
     burstHearts();
     announce("A bouquet of flowers and lots of love for you.");
+
+    // Allow the flowers and their ribbon to finish growing. Once the
+    // dedication appears, leave the complete bouquet visible for five
+    // seconds before returning the page to its envelope.
     schedule(() => {
-      heartLayer.replaceChildren();
-      finaleBouquetLayer.classList.remove("is-showing");
-      finaleBouquetLayer.replaceChildren();
-      envelopeStage.classList.remove("is-finale-bouquet");
-      phase = "reading";
-      syncEnvelope();
-      closeEnvelope(true);
-    }, reducedMotion.matches ? 1000 : durations.heartBurst, true);
+      finaleBouquetLayer.classList.add("is-message-visible");
+      announce("please take these flowers for you");
+      schedule(() => {
+        heartLayer.replaceChildren();
+        finaleBouquetLayer.classList.remove("is-showing","is-message-visible");
+        finaleBouquetLayer.replaceChildren();
+        envelopeStage.classList.remove("is-finale-bouquet");
+        phase = "reading";
+        syncEnvelope();
+        closeEnvelope(true);
+      }, durations.bouquetHold, true);
+    }, reducedMotion.matches ? 0 : durations.bouquetBloom, true);
   }
 
 
@@ -348,7 +361,7 @@
     invitationYes.disabled=true;
     invitationNo.disabled=true;
     invitationArea.classList.add("is-merging");
-    announce("i love you");
+    announce("see you soon, iloveyou");
     const token=++invitationEffectToken;
     setTimeout(()=>{
       if(token!==invitationEffectToken || current!==2) return;
