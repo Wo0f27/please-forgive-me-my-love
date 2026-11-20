@@ -1,4 +1,4 @@
-/* A Little Letter — v10
+/* A Little Letter — v11
    One letter with distinct extracting, unfolding, reading, refolding and
    reinserting phases. The final tap finishes the physical letter before
    opening the closing scene. No navigation bar or artificial page breaks. */
@@ -17,6 +17,10 @@
   const petals = document.getElementById("scene-petals");
   const heartLayer = document.getElementById("heart-burst");
   const garden = document.querySelector("[data-bloom-scene]");
+  const invitationYes = document.getElementById("invite-yes");
+  const invitationNo = document.getElementById("invite-no");
+  const invitationAnswer = document.getElementById("invite-answer");
+  const invitationSparkles = document.getElementById("invite-sparkles");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   let current = 0;
@@ -25,6 +29,7 @@
   let swipeStart = null;
   let generation = 0;
   let timers = [];
+  let invitationEffectToken = 0;
 
   const durations = {
     extract: 710, unfold: 620, expand: 640, heartBurst: 1650,
@@ -188,6 +193,45 @@
     }, durations.heartBurst);
   }
 
+
+  // A response stays local to the visitor's browser. Nothing is submitted,
+  // tracked or sent to the author. Both options are always tappable.
+  function chooseFireworks(answer) {
+    if (current !== 2) return;
+    const yes = answer === "yes";
+    invitationYes.setAttribute("aria-pressed", String(yes));
+    invitationNo.setAttribute("aria-pressed", String(!yes));
+    invitationAnswer.textContent = yes
+      ? "I'd love that. ♡ If you'd like to make plans, just tell me."
+      : "That's okay. Thank you for reading. ♡";
+
+    invitationEffectToken++;
+    const token = invitationEffectToken;
+    invitationSparkles.replaceChildren();
+    if (!yes || reducedMotion.matches) return;
+
+    const icons = ["💗","✨","💕","♡","✦","💖"];
+    const fragment = document.createDocumentFragment();
+    const count = 28;
+    for (let i=0;i<count;i++){
+      const sparkle = document.createElement("span");
+      sparkle.className = "invite-sparkle";
+      sparkle.textContent = icons[(i*5+i%4)%icons.length];
+      const radians = ((i*137.508)+15)*Math.PI/180;
+      const radius = 64+(i%7)*14;
+      sparkle.style.setProperty("--dx",Math.round(Math.cos(radians)*radius)+"px");
+      sparkle.style.setProperty("--dy",Math.round(Math.sin(radians)*radius-32)+"px");
+      sparkle.style.setProperty("--turn",((-90+i*27)%180)+"deg");
+      sparkle.style.setProperty("--delay",((i%7)*28)+"ms");
+      sparkle.style.setProperty("--size",(15+(i%5)*4)+"px");
+      fragment.appendChild(sparkle);
+    }
+    invitationSparkles.appendChild(fragment);
+    setTimeout(() => {
+      if (token === invitationEffectToken) invitationSparkles.replaceChildren();
+    },1450);
+  }
+
   function closeEnvelope(advanceToEnding = false) {
     if (phase !== "reading") return;
     cancelSequence();
@@ -259,6 +303,17 @@
   document.getElementById("start-reading").addEventListener("click", () => go(1));
   cover.addEventListener("click",openEnvelope);
   lastHeart.addEventListener("click", launchHeartFinale);
+  invitationYes.addEventListener("click",()=>chooseFireworks("yes"));
+  invitationNo.addEventListener("click",()=>chooseFireworks("no"));
+  // Explicitly support hardware keyboards as well as touchscreen taps.
+  // Prevent native keyboard click synthesis so an answer is never selected twice.
+  function chooseViaKeyboard(event,answer) {
+    if (event.repeat || !["Enter"," ","Spacebar"].includes(event.key)) return;
+    event.preventDefault();
+    chooseFireworks(answer);
+  }
+  invitationYes.addEventListener("keydown",event=>chooseViaKeyboard(event,"yes"));
+  invitationNo.addEventListener("keydown",event=>chooseViaKeyboard(event,"no"));
   previous.addEventListener("click",back);
   nextButton.addEventListener("click",next);
   paper.addEventListener("scroll",() => {

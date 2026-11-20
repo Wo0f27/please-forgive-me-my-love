@@ -609,3 +609,176 @@ body{background:#fff1e9;color:var(--text)}
   max-width:100%;height:auto;
   filter:drop-shadow(0 9px 18px #c2899b40)
 }
+
+
+/* Version 11: a small, touch-friendly invitation inspired by the user's
+   reference clip. A genuine "Not this time" option never evades a tap. */
+#one-last-thing{
+  overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+#one-last-thing::-webkit-scrollbar{display:none}
+.fireworks-ending{
+  width:min(100%,490px);max-width:490px;min-width:0;
+  gap:clamp(6px,1.5vh,12px);padding:4px 0;
+}
+.fireworks-ending .animated-sticker{
+  width:auto;max-width:100%;display:flex;justify-content:center;
+}
+.fireworks-ending .animated-sticker .art-ending{
+  width:auto;height:auto;max-height:min(24dvh,180px);
+  max-width:min(45vw,210px);object-fit:contain;
+}
+.invite-window{
+  position:relative;isolation:isolate;width:100%;min-width:0;
+  text-align:center;border:1px solid #d991b0;border-radius:12px;
+  background:linear-gradient(135deg,#fff6f4,#fff9f0 55%,#ffe9f1);
+  box-shadow:0 13px 32px #bc79953b,0 2px 9px #d69aaa24,inset 0 1px #fff;
+  color:#78455e;overflow:visible;
+}
+.invite-window-bar{
+  height:30px;display:flex;justify-content:space-between;align-items:center;
+  padding:0 12px;gap:8px;border-radius:11px 11px 0 0;
+  background:linear-gradient(90deg,#edaabe,#f5c8d4);
+  border-bottom:1px solid #dca2b5;
+  font:600 12px/1.2 Georgia,serif;letter-spacing:.03em;color:#7e4560;
+}
+.invite-window-bar span:last-child{letter-spacing:.2em;color:#b86483}
+.invite-window-body{
+  position:relative;z-index:2;
+  padding:clamp(13px,3vw,22px) clamp(13px,3.3vw,24px) 14px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:clamp(9px,1.6vh,14px);
+}
+.fireworks-ending .invite-window h2{
+  font:400 clamp(23px,4.1vw,34px)/1.24 Georgia,serif;
+  letter-spacing:-.025em;color:#884c6a;
+  margin:0;max-width:410px;
+  text-wrap:balance;
+}
+.fireworks-ending .invite-window p{
+  max-width:100%;margin:0;
+}
+.fireworks-ending .invite-event{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  font:14px/1.35 Georgia,serif;
+  color:#805d70;
+}
+.fireworks-ending .invite-event strong{
+  font-size:15px;line-height:1.3;
+  color:#9b5877;font-weight:600;
+}
+.invite-actions{
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
+  width:100%;gap:clamp(10px,2vw,16px);
+}
+.invite-choice{
+  flex:1 1 136px;max-width:190px;min-width:112px;min-height:52px;
+  border-radius:9px;border:1px solid #d89ab1;
+  padding:12px 16px;text-align:center;
+  font:600 16px/1.22 Georgia,serif;
+  touch-action:manipulation;
+  transition:background .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.invite-yes{
+  background:linear-gradient(145deg,#eaa5bb,#d47f9c);
+  box-shadow:0 5px 13px #b36c8b3d,inset 0 1px #fff5;
+  color:#fffdfa;border-color:#bb6b8b;
+}
+.invite-no{
+  background:#fff9f7;color:#875b70;
+  box-shadow:0 4px 11px #d9a9b329;
+}
+.invite-yes:hover,.invite-yes[aria-pressed="true"]{
+  background:linear-gradient(145deg,#e995b1,#c76e90);
+  box-shadow:0 7px 16px #b36c8b4b;
+}
+.invite-no:hover,.invite-no[aria-pressed="true"]{
+  background:#f9e5eb;border-color:#bd839d;
+}
+.invite-choice:focus-visible{
+  outline:3px solid #955b76;outline-offset:3px;
+}
+.fireworks-ending .invite-answer{
+  min-height:0;font:italic 15px/1.45 Georgia,serif;
+  color:#865369;
+}
+.fireworks-ending .invite-answer:empty{display:none}
+.fireworks-ending .invite-privacy{
+  font:12px/1.35 Georgia,serif;color:#987c84;
+  max-width:360px;
+}
+.fireworks-ending .ending-flowers{
+  font-size:21px;gap:22px;margin:0;
+}
+.invite-sparkles{
+  position:absolute;inset:0;z-index:4;pointer-events:none;
+  overflow:visible;
+}
+.invite-sparkle{
+  position:absolute;left:50%;top:65%;
+  font-size:var(--size);line-height:1;
+  opacity:0;will-change:transform,opacity;
+  animation:inviteFirework 1.15s var(--delay) ease-out both;
+}
+@keyframes inviteFirework{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(0)}
+  22%{opacity:1}
+  75%{opacity:.9}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),
+    calc(-50% + var(--dy))) scale(.85) rotate(var(--turn))}
+}
+@media(max-width:480px){
+  #one-last-thing{padding:16px max(15px,env(safe-area-inset-left))
+    max(16px,env(safe-area-inset-bottom)) max(15px,env(safe-area-inset-right))}
+  .fireworks-ending{width:100%;gap:8px}
+  .fireworks-ending .animated-sticker .art-ending{
+    max-height:min(22dvh,151px);max-width:44vw;
+  }
+  .invite-window-body{padding:14px 13px 13px;gap:10px}
+  .fireworks-ending .invite-window h2{font-size:clamp(23px,6.5vw,28px)}
+  .fireworks-ending .invite-event{font-size:13px}
+  .invite-choice{min-height:50px;font-size:15px;padding:11px 9px}
+}
+@media(max-width:345px){
+  .invite-choice{flex-basis:104px;min-width:102px}
+  .fireworks-ending .invite-window h2{font-size:22px}
+  .fireworks-ending .invite-privacy{font-size:11px}
+}
+@media(max-height:530px) and (orientation:landscape){
+  #one-last-thing{padding:9px max(14px,env(safe-area-inset-right))
+    9px max(14px,env(safe-area-inset-left))}
+  .ending.fireworks-ending{
+    display:grid;grid-template-columns:minmax(110px,160px) minmax(0,1fr);
+    gap:clamp(10px,3vw,26px);text-align:center;align-items:center;
+    width:min(100%,730px);max-width:730px;
+  }
+  .fireworks-ending .animated-sticker{
+    grid-column:1;grid-row:1;align-self:center;justify-self:center;
+  }
+  .fireworks-ending .animated-sticker .art-ending{
+    max-height:min(63dvh,175px);max-width:100%;
+  }
+  .fireworks-ending .invite-window{
+    grid-column:2;grid-row:1;width:100%;
+  }
+  .fireworks-ending .invite-window-body{gap:6px;padding:9px 12px}
+  .fireworks-ending .invite-window h2{font-size:clamp(19px,3vw,25px)}
+  .fireworks-ending .invite-event,.fireworks-ending .invite-event strong{font-size:12px}
+  .fireworks-ending .invite-answer{font-size:12px}
+  .fireworks-ending .invite-privacy{font-size:10px}
+  .invite-window-bar{height:24px}
+  .invite-choice{min-height:44px;flex-basis:100px;font-size:14px;padding:8px}
+  .fireworks-ending .ending-flowers{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .invite-sparkle{animation:none!important;display:none!important}
+  .invite-choice{transition:none!important}
+}
+
+
+/* Keep the actual tap target at least 48px tall even while the scene's
+   subtle scale-in transition is in progress on short landscape phones. */
+@media(max-height:530px) and (orientation:landscape){
+  .invite-choice{min-height:48px}
+}

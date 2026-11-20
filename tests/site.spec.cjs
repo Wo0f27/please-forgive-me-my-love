@@ -548,12 +548,17 @@ test("reading state begins only after mobile parchment finishes expanding", asyn
 
 
 
-test("closing page has no read-it-again control, without altering its messages", async ({page}) => {
+test("closing page asks the single fireworks invitation without a replay control", async ({page}) => {
   await page.goto("/");
   await expect(page.locator("#again")).toHaveCount(0);
   await expect(page.getByRole("button",{name:/read it again/i})).toHaveCount(0);
-  await expect(page.locator("#ending-title")).toHaveText("I love you.");
-  await expect(page.locator("#one-last-thing p")).toHaveCount(2);
+  await expect(page.locator("#ending-title")).toHaveText("Will you go watch the fireworks with me tomorrow? ♡");
+  await expect(page.locator("#one-last-thing .invite-event")).toContainText("Saturday, November 21");
+  await expect(page.locator("#one-last-thing .invite-event")).toContainText("SM City Pampanga");
+  await expect(page.locator("#one-last-thing .invite-event")).toContainText("Event starts at 6:00 PM");
+  await expect(page.locator("#invite-yes")).toHaveText("Yes ♡");
+  await expect(page.locator("#invite-no")).toHaveText("Not this time");
+  await expect(page.locator(".invite-privacy")).toContainText("won't send me a message");
 });
 
 test("all eight visible stickers use full-resolution local animated WebP with static reduced-motion alternates", async ({page}) => {
@@ -635,4 +640,118 @@ test("reduced-motion users receive the original transparent still alternatives",
   const intro=await page.locator(".art-opening").evaluate(el=>el.currentSrc);
   expect(intro).toMatch(/\.png$/);
   await expect(page.locator("#again")).toHaveCount(0);
+});
+
+
+
+async function reachFireworksInvitation(page) {
+  await openTheActualLetter(page);
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:9000});
+}
+
+test("the fireworks invitation is a real choice on desktop and mobile", async ({page}) => {
+  await reachFireworksInvitation(page);
+  const yes=page.locator("#invite-yes");
+  const no=page.locator("#invite-no");
+  await expect(yes).toBeVisible();
+  await expect(no).toBeVisible();
+  await expect(yes).toHaveAttribute("aria-pressed","false");
+  await expect(no).toHaveAttribute("aria-pressed","false");
+  await page.screenshot({path:test.info().outputPath("fireworks-invitation.png"),fullPage:false});
+  const position=()=>no.evaluate(el=>{
+    const btn=el.getBoundingClientRect();
+    const parent=el.closest(".invite-window").getBoundingClientRect();
+    return {x:btn.left-parent.left,y:btn.top-parent.top};
+  });
+  const noBefore=await position();
+  await no.hover();
+  const noAfter=await position();
+  expect(Math.abs(noAfter.x-noBefore.x)).toBeLessThan(1);
+  expect(Math.abs(noAfter.y-noBefore.y)).toBeLessThan(1);
+  await no.click();
+  await expect(no).toHaveAttribute("aria-pressed","true");
+  await expect(yes).toHaveAttribute("aria-pressed","false");
+  await expect(page.locator("#invite-answer")).toHaveText("That's okay. Thank you for reading. ♡");
+  await expect(page.locator("#invite-sparkles")).toBeEmpty();
+  await yes.click();
+  await expect(yes).toHaveAttribute("aria-pressed","true");
+  await expect(no).toHaveAttribute("aria-pressed","false");
+  await expect(page.locator("#invite-answer")).toContainText("I'd love that.");
+  await expect(page.locator("#invite-sparkles .invite-sparkle")).toHaveCount(28);
+  await page.screenshot({path:test.info().outputPath("fireworks-yes.png"),fullPage:false});
+});
+
+test("phone portrait, tiny screens and landscape keep both invitation choices reachable", async ({page}) => {
+  await reachFireworksInvitation(page);
+  for(const size of [
+    {width:390,height:844},
+    {width:360,height:600},
+    {width:320,height:568},
+    {width:844,height:390}
+  ]){
+    await page.setViewportSize(size);
+    await page.waitForTimeout(780); // avoid sampling scene scale-in
+    const metrics=await page.evaluate(()=>{
+      const rect=selector=>{
+        const r=document.querySelector(selector).getBoundingClientRect();
+        return {x:r.x,y:r.y,left:r.left,right:r.right,top:r.top,bottom:r.bottom,
+          width:r.width,height:r.height};
+      };
+      return {yes:rect("#invite-yes"),no:rect("#invite-no"),
+        question:rect("#ending-title"),card:rect(".invite-window"),
+        viewport:window.innerWidth};
+    });
+    for(const button of [metrics.yes,metrics.no]){
+      expect(button.height,JSON.stringify(size)).toBeGreaterThanOrEqual(44);
+      expect(button.width,JSON.stringify(size)).toBeGreaterThanOrEqual(100);
+      expect(button.left,JSON.stringify(size)).toBeGreaterThanOrEqual(-1);
+      expect(button.right,JSON.stringify(size)).toBeLessThanOrEqual(size.width+1);
+    }
+    expect(metrics.card.left,JSON.stringify(size)).toBeGreaterThanOrEqual(-1);
+    expect(metrics.card.right,JSON.stringify(size)).toBeLessThanOrEqual(size.width+1);
+    await expect(page.locator("#invite-yes")).toBeVisible();
+    await expect(page.locator("#invite-no")).toBeVisible();
+  }
+  await page.locator("#invite-no").click();
+  await expect(page.locator("#invite-answer")).toContainText("That's okay");
+});
+
+test("answer selection never sends an RSVP or request to another service", async ({page}) => {
+  const actions=[];
+  page.on("request",req=>{
+    if(!["GET","HEAD"].includes(req.method()))actions.push(req.method()+" "+req.url());
+  });
+  await reachFireworksInvitation(page);
+  await page.locator("#invite-yes").click();
+  await page.locator("#invite-no").click();
+  expect(actions).toEqual([]);
+  await expect(page.locator(".invite-privacy")).toContainText("stays on this page");
+});
+
+test("invitation buttons work with keyboard and reduced motion skips confetti", async ({page}) => {
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await reachFireworksInvitation(page);
+  await page.waitForTimeout(750); // scene must finish becoming focusable before keys
+  const yes=page.locator("#invite-yes");
+  const no=page.locator("#invite-no");
+  await expect(yes).toBeVisible();
+  await expect.poll(async()=>{
+    await yes.focus();
+    return yes.evaluate(el=>document.activeElement===el);
+  },{timeout:3500}).toBe(true);
+  await page.keyboard.press("Enter");
+  await expect(yes).toHaveAttribute("aria-pressed","true");
+  await expect(page.locator("#invite-answer")).toContainText("I'd love that");
+  await expect(page.locator("#invite-sparkles")).toBeEmpty();
+  await expect.poll(async()=>{
+    await no.focus();
+    return no.evaluate(el=>document.activeElement===el);
+  },{timeout:3500}).toBe(true);
+  await page.keyboard.press("Space");
+  await expect(no).toHaveAttribute("aria-pressed","true");
+  await expect(page.locator("#invite-answer")).toContainText("That's okay");
 });
