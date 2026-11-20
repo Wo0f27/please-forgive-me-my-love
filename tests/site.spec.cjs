@@ -431,7 +431,7 @@ test("the heart finale emits a large burst before any folding or scene transitio
   await expect(page.locator("#one-last-thing")).not.toHaveClass(/is-current/);
   await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
   await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(0);
-  await expect(page.locator(".ending-flowers span")).toHaveCount(3);
+  await expect(page.locator("#ending-title")).toHaveText("Will you go with me to watch the fireworks tomorrow?");
 });
 
 
