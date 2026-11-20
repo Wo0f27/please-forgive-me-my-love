@@ -399,9 +399,9 @@ test("the bouquet dedication appears after creation and remains five seconds bef
   await page.locator("#last-heart").click();
   const message=page.locator("#finale-bouquet-layer .bouquet-message");
   await expect(message).toHaveText("please take these flowers for you");
-  await expect(message).toBeHidden();
+  await expect(message).toHaveCSS("opacity","0");
   await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
-  await expect(message).toBeVisible({timeout:3500});
+  await expect(message).toHaveCSS("opacity","1",{timeout:3500});
   const start=Date.now();
   await page.waitForTimeout(3800);
   await expect(message).toBeVisible();
