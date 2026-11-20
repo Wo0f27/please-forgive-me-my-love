@@ -431,7 +431,7 @@ test("the heart finale emits a large burst before any folding or scene transitio
   await expect(page.locator("#one-last-thing")).not.toHaveClass(/is-current/);
   await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7500});
   await expect(page.locator("#heart-burst .heart-particle")).toHaveCount(0);
-  await expect(page.locator(".ending-flowers span")).toHaveCount(3);
+  await expect(page.locator("#ending-title")).toHaveText("Will you go with me to watch the fireworks tomorrow?");
 });
 
 
@@ -548,17 +548,16 @@ test("reading state begins only after mobile parchment finishes expanding", asyn
 
 
 
-test("closing page asks the single fireworks invitation without a replay control", async ({page}) => {
+test("closing page shows only the fireworks question and two choices", async ({page}) => {
   await page.goto("/");
   await expect(page.locator("#again")).toHaveCount(0);
-  await expect(page.getByRole("button",{name:/read it again/i})).toHaveCount(0);
-  await expect(page.locator("#ending-title")).toHaveText("Will you go watch the fireworks with me tomorrow? ♡");
-  await expect(page.locator("#one-last-thing .invite-event")).toContainText("Saturday, November 21");
-  await expect(page.locator("#one-last-thing .invite-event")).toContainText("SM City Pampanga");
-  await expect(page.locator("#one-last-thing .invite-event")).toContainText("Event starts at 6:00 PM");
-  await expect(page.locator("#invite-yes")).toHaveText("Yes ♡");
-  await expect(page.locator("#invite-no")).toHaveText("Not this time");
-  await expect(page.locator(".invite-privacy")).toContainText("won't send me a message");
+  await expect(page.locator("#ending-title")).toHaveText("Will you go with me to watch the fireworks tomorrow?");
+  await expect(page.locator("#invite-yes")).toHaveText("Yes");
+  await expect(page.locator("#invite-no")).toHaveText("No");
+  await expect(page.locator("#one-last-thing p")).toHaveCount(0);
+  await expect(page.locator(".invite-event,.invite-privacy,.invite-answer,.invite-window-bar,.ending-flowers")).toHaveCount(0);
+  await expect(page.locator("#invite-heart-result")).toHaveAttribute("aria-hidden","true");
+  await expect(page.locator("#invite-heart-result")).toContainText("i love you");
 });
 
 test("all eight visible stickers use full-resolution local animated WebP with static reduced-motion alternates", async ({page}) => {
@@ -653,105 +652,150 @@ async function reachFireworksInvitation(page) {
   await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:9000});
 }
 
-test("the fireworks invitation is a real choice on desktop and mobile", async ({page}) => {
+test("No hops away after each tap and stays inside the invitation on desktop and mobile", async ({page}) => {
   await reachFireworksInvitation(page);
   const yes=page.locator("#invite-yes");
   const no=page.locator("#invite-no");
+  const area=page.locator("#invite-play-area");
   await expect(yes).toBeVisible();
   await expect(no).toBeVisible();
-  await expect(yes).toHaveAttribute("aria-pressed","false");
-  await expect(no).toHaveAttribute("aria-pressed","false");
-  await page.screenshot({path:test.info().outputPath("fireworks-invitation.png"),fullPage:false});
-  const position=()=>no.evaluate(el=>{
-    const btn=el.getBoundingClientRect();
-    const parent=el.closest(".invite-window").getBoundingClientRect();
-    return {x:btn.left-parent.left,y:btn.top-parent.top};
-  });
-  const noBefore=await position();
-  await no.hover();
-  const noAfter=await position();
-  expect(Math.abs(noAfter.x-noBefore.x)).toBeLessThan(1);
-  expect(Math.abs(noAfter.y-noBefore.y)).toBeLessThan(1);
-  await no.click();
-  await expect(no).toHaveAttribute("aria-pressed","true");
-  await expect(yes).toHaveAttribute("aria-pressed","false");
-  await expect(page.locator("#invite-answer")).toHaveText("That's okay. Thank you for reading. ♡");
-  await expect(page.locator("#invite-sparkles")).toBeEmpty();
-  await yes.click();
-  await expect(yes).toHaveAttribute("aria-pressed","true");
-  await expect(no).toHaveAttribute("aria-pressed","false");
-  await expect(page.locator("#invite-answer")).toContainText("I'd love that.");
-  await expect(page.locator("#invite-sparkles .invite-sparkle")).toHaveCount(28);
-  await page.screenshot({path:test.info().outputPath("fireworks-yes.png"),fullPage:false});
-});
-
-test("phone portrait, tiny screens and landscape keep both invitation choices reachable", async ({page}) => {
-  await reachFireworksInvitation(page);
-  for(const size of [
-    {width:390,height:844},
-    {width:360,height:600},
-    {width:320,height:568},
-    {width:844,height:390}
-  ]){
-    await page.setViewportSize(size);
-    await page.waitForTimeout(780); // avoid sampling scene scale-in
-    const metrics=await page.evaluate(()=>{
-      const rect=selector=>{
-        const r=document.querySelector(selector).getBoundingClientRect();
-        return {x:r.x,y:r.y,left:r.left,right:r.right,top:r.top,bottom:r.bottom,
-          width:r.width,height:r.height};
-      };
-      return {yes:rect("#invite-yes"),no:rect("#invite-no"),
-        question:rect("#ending-title"),card:rect(".invite-window"),
-        viewport:window.innerWidth};
-    });
-    for(const button of [metrics.yes,metrics.no]){
-      expect(button.height,JSON.stringify(size)).toBeGreaterThanOrEqual(44);
-      expect(button.width,JSON.stringify(size)).toBeGreaterThanOrEqual(100);
-      expect(button.left,JSON.stringify(size)).toBeGreaterThanOrEqual(-1);
-      expect(button.right,JSON.stringify(size)).toBeLessThanOrEqual(size.width+1);
-    }
-    expect(metrics.card.left,JSON.stringify(size)).toBeGreaterThanOrEqual(-1);
-    expect(metrics.card.right,JSON.stringify(size)).toBeLessThanOrEqual(size.width+1);
-    await expect(page.locator("#invite-yes")).toBeVisible();
-    await expect(page.locator("#invite-no")).toBeVisible();
+  await page.waitForTimeout(760);
+  await page.screenshot({path:test.info().outputPath("invitation-before-taps.png"),fullPage:false});
+  let previous=await no.boundingBox();
+  for(let i=0;i<8;i++){
+    await no.click();
+    await page.waitForTimeout(330);
+    const current=await no.boundingBox();
+    const bounds=await area.boundingBox();
+    const yesBounds=await yes.boundingBox();
+    expect(Math.hypot(current.x-previous.x,current.y-previous.y),"No tap "+i).toBeGreaterThan(18);
+    expect(current.left??current.x).toBeGreaterThanOrEqual(bounds.x-2);
+    expect(current.x+current.width).toBeLessThanOrEqual(bounds.x+bounds.width+2);
+    expect(current.y).toBeGreaterThanOrEqual(bounds.y-2);
+    expect(current.y+current.height).toBeLessThanOrEqual(bounds.y+bounds.height+2);
+    const overlaps=current.x < yesBounds.x+yesBounds.width &&
+      current.x+current.width > yesBounds.x &&
+      current.y < yesBounds.y+yesBounds.height &&
+      current.y+current.height > yesBounds.y;
+    expect(overlaps,"No must never cover Yes").toBe(false);
+    previous=current;
   }
-  await page.locator("#invite-no").click();
-  await expect(page.locator("#invite-answer")).toContainText("That's okay");
+  await expect(page.locator("#invite-play-area")).not.toHaveClass(/is-merging|is-heart/);
+  await expect(page.locator("#invite-heart-result")).toHaveAttribute("aria-hidden","true");
+  await page.screenshot({path:test.info().outputPath("no-after-eight-taps.png"),fullPage:false});
 });
 
-test("answer selection never sends an RSVP or request to another service", async ({page}) => {
-  const actions=[];
-  page.on("request",req=>{
-    if(!["GET","HEAD"].includes(req.method()))actions.push(req.method()+" "+req.url());
-  });
+test("Yes pulls both buttons together and turns into an i love you heart", async ({page}) => {
   await reachFireworksInvitation(page);
-  await page.locator("#invite-yes").click();
-  await page.locator("#invite-no").click();
-  expect(actions).toEqual([]);
-  await expect(page.locator(".invite-privacy")).toContainText("stays on this page");
-});
-
-test("invitation buttons work with keyboard and reduced motion skips confetti", async ({page}) => {
-  await page.emulateMedia({reducedMotion:"reduce"});
-  await reachFireworksInvitation(page);
-  await page.waitForTimeout(750); // scene must finish becoming focusable before keys
+  await page.waitForTimeout(760);
   const yes=page.locator("#invite-yes");
   const no=page.locator("#invite-no");
-  await expect(yes).toBeVisible();
-  await expect.poll(async()=>{
-    await yes.focus();
-    return yes.evaluate(el=>document.activeElement===el);
-  },{timeout:3500}).toBe(true);
-  await page.keyboard.press("Enter");
-  await expect(yes).toHaveAttribute("aria-pressed","true");
-  await expect(page.locator("#invite-answer")).toContainText("I'd love that");
-  await expect(page.locator("#invite-sparkles")).toBeEmpty();
+  await yes.click();
+  const area=page.locator("#invite-play-area");
+  await expect(area).toHaveClass(/is-merging/);
+  await expect(yes).toBeDisabled();
+  await expect(no).toBeDisabled();
+  await page.waitForTimeout(260);
+  const middle=await Promise.all([yes.boundingBox(),no.boundingBox()]);
+  const center=b=>({x:b.x+b.width/2,y:b.y+b.height/2});
+  const one=center(middle[0]),two=center(middle[1]);
+  expect(Math.hypot(one.x-two.x,one.y-two.y)).toBeLessThan(140);
+  await expect(area).toHaveClass(/is-heart/,{timeout:2500});
+  await expect(page.locator("#invite-heart-result")).toHaveAttribute("aria-hidden","false");
+  await expect(page.locator("#invite-heart-result")).toBeVisible();
+  await expect(page.locator("#invite-heart-result")).toHaveText("i love you");
+  await expect(page.locator("#invite-sparkles .invite-sparkle")).toHaveCount(30);
+  await page.waitForTimeout(530); // capture the settled heart, not its first frame
+  const contrast=await page.locator("#invite-heart-result span").evaluate(el=>({
+    size:parseFloat(getComputedStyle(el).fontSize),
+    stack:getComputedStyle(el.closest(".invite-window-body")).zIndex
+  }));
+  expect(contrast.size).toBeGreaterThanOrEqual(19);
+  expect(Number(contrast.stack)).toBeGreaterThan(4);
+  await page.screenshot({path:test.info().outputPath("merged-heart.png"),fullPage:false});
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/);
+});
+
+test("phone widths and landscape keep No within bounds over multiple hops", async ({page}) => {
+  await reachFireworksInvitation(page);
+  for(const size of [
+    {width:390,height:844},{width:360,height:600},
+    {width:320,height:568},{width:844,height:390}
+  ]){
+    await page.setViewportSize(size);
+    await page.waitForTimeout(780);
+    const no=page.locator("#invite-no");
+    const yes=page.locator("#invite-yes");
+    for(let n=0;n<3;n++){
+      await no.click();
+      await page.waitForTimeout(320);
+      const bounds=await page.locator("#invite-play-area").boundingBox();
+      const b=await no.boundingBox();
+      const y=await yes.boundingBox();
+      expect(b.height,JSON.stringify(size)).toBeGreaterThanOrEqual(44);
+      expect(b.width,JSON.stringify(size)).toBeGreaterThanOrEqual(100);
+      expect(b.x).toBeGreaterThanOrEqual(bounds.x-2);
+      expect(b.x+b.width).toBeLessThanOrEqual(bounds.x+bounds.width+2);
+      expect(b.y).toBeGreaterThanOrEqual(bounds.y-2);
+      expect(b.y+b.height).toBeLessThanOrEqual(bounds.y+bounds.height+2);
+      expect(b.x+b.width).toBeLessThanOrEqual(size.width+2);
+      expect(y.x).toBeGreaterThanOrEqual(-1);
+      expect(y.x+y.width).toBeLessThanOrEqual(size.width+2);
+    }
+    await expect(yes).toBeVisible();
+  }
+});
+
+test("keyboard No hops; keyboard Yes makes heart without animation in reduced motion", async ({page}) => {
+  await page.emulateMedia({reducedMotion:"reduce"});
+  await reachFireworksInvitation(page);
+  await page.waitForTimeout(750);
+  const no=page.locator("#invite-no");
   await expect.poll(async()=>{
     await no.focus();
     return no.evaluate(el=>document.activeElement===el);
   },{timeout:3500}).toBe(true);
+  const before=await no.boundingBox();
+  await page.keyboard.press("Enter");
+  const after=await no.boundingBox();
+  expect(Math.hypot(after.x-before.x,after.y-before.y)).toBeGreaterThan(18);
+  const yes=page.locator("#invite-yes");
+  await expect.poll(async()=>{
+    await yes.focus();
+    return yes.evaluate(el=>document.activeElement===el);
+  },{timeout:3500}).toBe(true);
   await page.keyboard.press("Space");
-  await expect(no).toHaveAttribute("aria-pressed","true");
-  await expect(page.locator("#invite-answer")).toContainText("That's okay");
+  await expect(page.locator("#invite-play-area")).toHaveClass(/is-heart/,{timeout:1500});
+  await expect(page.locator("#invite-heart-result")).toBeVisible();
+  await expect(page.locator("#invite-sparkles")).toBeEmpty();
+});
+
+test("the heart sequence is local-only with no RSVP or server requests", async ({page}) => {
+  const outbound=[];
+  page.on("request",req=>{
+    if(!["GET","HEAD"].includes(req.method()))outbound.push(req.method()+" "+req.url());
+  });
+  await reachFireworksInvitation(page);
+  await page.locator("#invite-no").click();
+  await page.locator("#invite-yes").click();
+  await expect(page.locator("#invite-play-area")).toHaveClass(/is-heart/,{timeout:2500});
+  expect(outbound).toEqual([]);
+});
+
+test("returning to the letter resets the invitation for a new visit", async ({page}) => {
+  await reachFireworksInvitation(page);
+  await page.locator("#invite-yes").click();
+  await expect(page.locator("#invite-play-area")).toHaveClass(/is-heart/,{timeout:2500});
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.locator("#sealed")).toHaveClass(/is-current/);
+  await page.locator("#envelope-cover").click();
+  await expect(page.locator("#envelope")).toHaveClass(/is-reading/,{timeout:4500});
+  await page.locator("#letter-paper").evaluate(el=>{
+    el.scrollTop=el.scrollHeight;el.dispatchEvent(new Event("scroll"));
+  });
+  await page.locator("#last-heart").click();
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:9000});
+  await expect(page.locator("#invite-play-area")).not.toHaveClass(/is-heart|is-merging/);
+  await expect(page.locator("#invite-yes")).toBeEnabled();
+  await expect(page.locator("#invite-no")).toBeEnabled();
 });

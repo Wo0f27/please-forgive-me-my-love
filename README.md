@@ -4,6 +4,18 @@ A cozy Peach and Goma apology website hosted on GitHub Pages.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
+## Version 12 — playful fireworks question and merging heart
+
+The final screen is simplified to a single question and two buttons:
+
+**Will you go with me to watch the fireworks tomorrow?**
+
+- **No** playfully hops to a different in-bounds position after each tap or keyboard activation. The button remains on screen, and **Yes** remains stationary.
+- **Yes** brings both buttons to the center of the invitation. They shrink and disappear together while a pink heart emerges with the words **"i love you"**. Heart and sparkle particles appear around the completed heart.
+- No explicit date, venue, time, event subtitle, extra explanatory copy, or replay button appears on this screen. The existing animated Peach and Goma illustration remains above the pink invitation.
+- Buttons are kept within the interactive region on portrait phones, 320px widths, short-height landscape layouts, and desktop. The choreography respects reduced-motion settings.
+- The response is local to the webpage. No RSVP or response is transmitted or stored. Navigating back to the letter and reopening the ending resets the sequence.
+
 ## Version 11 — a private, phone-friendly fireworks invitation
 
 The closing scene now follows the reference video's **cute pink pop-up window** idea without adding a second envelope or obstructing the real apology letter. The user asked for a direct invitation to watch the fireworks together on Saturday, November 21, 2026, at SM City Pampanga (Amphitheatre). The event's published start is 6:00 PM; the exact fireworks ignition time is not stated separately.
