@@ -4,6 +4,16 @@ A cozy Peach and Goma apology website hosted on GitHub Pages.
 
 **Live:** https://wo0f27.github.io/please-forgive-me-my-love/
 
+## Version 14 — final personalized letter, music and bouquet staging
+
+- Replaced the apology text with the user's own **exact Taglish letter**, preserving its original word choices, punctuation and paragraphs; the signoff is **With love, Your Woof**.
+- Changed the first button to **Please read this...**.
+- Added **- Your Woof** between the fireworks question and its Yes/No controls.
+- While the final heart creates the wrapped bouquet alongside the 64-heart burst, temporarily hide the animated Peach/Goma figures inside the letter scene so no mascot artwork overlaps the flowers. The figures return as the original physical refolding/closing animation starts.
+- Added the user-supplied **Bandari — The First Snowflakes** song as `assets/music/first-snowflakes.m4a` (AAC-LC, stereo, about 196 seconds, looped). The music begins after the letter opens, **muted by default**, with an explicit button to toggle sound. The song stops and resets when the final heart is activated or the letter is closed early. Reopening starts muted again.
+- Preserved the existing envelope and fireworks interaction; all music playback is in-browser with no telemetry or external audio host.
+- The browser-friendly AAC audio was encoded at a compact rate from the user-supplied file for responsive mobile loading.
+
 ## Version 13 — flowers bloom when the last heart is pressed
 
 The end-of-letter heart now starts **two effects together**: a wrapped bouquet grows visibly in the viewport and the existing 64-heart emoji burst launches. The bouquet is the same three-flower artwork originally drawn for the letter, now held as an invisible illustration template instead of blooming during reading. This avoids having the flowers already grown before the user presses the heart, or having them hidden above the viewport at the time of the tap.
