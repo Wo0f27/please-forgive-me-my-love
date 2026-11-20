@@ -736,7 +736,18 @@ test("invitation buttons work with keyboard and reduced motion skips confetti", 
   await page.emulateMedia({reducedMotion:"reduce"});
   await reachFireworksInvitation(page);
   await page.locator("#invite-yes").focus();
-  await page.keyboard.press("Enter");
+  console.log("FOCUS BEFORE",await page.evaluate(()=>({
+    active:document.activeElement?.id,
+    sceneCurrent:document.querySelector("#one-last-thing").className,
+    sceneInert:document.querySelector("#one-last-thing").inert,
+    pressed:document.querySelector("#invite-yes").getAttribute("aria-pressed")
+  })));
+  await page.locator("#invite-yes").press("Enter");
+  console.log("FOCUS AFTER",await page.evaluate(()=>({
+    active:document.activeElement?.id,
+    pressed:document.querySelector("#invite-yes").getAttribute("aria-pressed"),
+    answer:document.querySelector("#invite-answer").textContent
+  })));
   await expect(page.locator("#invite-yes")).toHaveAttribute("aria-pressed","true");
   await expect(page.locator("#invite-answer")).toContainText("I'd love that");
   await expect(page.locator("#invite-sparkles")).toBeEmpty();
