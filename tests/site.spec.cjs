@@ -427,7 +427,10 @@ test("reduced motion still holds the fully formed flowers and note five seconds"
   await page.waitForTimeout(3500);
   await expect(page.locator("#envelope")).toHaveClass(/is-heartburst/);
   await expect(message).toBeVisible();
-  await expect(page.locator("#envelope")).toHaveClass(/is-refolding/,{timeout:2600});
+  // In reduced motion, refolding transitions through its state immediately;
+  // observe the actual completed scene rather than polling a transient class.
+  await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/,{timeout:7000});
+  await expect(page.locator("#finale-bouquet-layer")).toBeEmpty();
 });
 
 test("the tap grows stems, leaves, petals and wrapper while hearts fly, then folding begins", async ({page}) => {
