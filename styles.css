@@ -775,3 +775,10 @@ body{background:#fff1e9;color:var(--text)}
   .invite-sparkle{animation:none!important;display:none!important}
   .invite-choice{transition:none!important}
 }
+
+
+/* Keep the actual tap target at least 48px tall even while the scene's
+   subtle scale-in transition is in progress on short landscape phones. */
+@media(max-height:530px) and (orientation:landscape){
+  .invite-choice{min-height:48px}
+}

@@ -662,9 +662,14 @@ test("the fireworks invitation is a real choice on desktop and mobile", async ({
   await expect(yes).toHaveAttribute("aria-pressed","false");
   await expect(no).toHaveAttribute("aria-pressed","false");
   await page.screenshot({path:test.info().outputPath("fireworks-invitation.png"),fullPage:false});
-  const noBefore=await no.boundingBox();
+  const position=()=>no.evaluate(el=>{
+    const btn=el.getBoundingClientRect();
+    const parent=el.closest(".invite-window").getBoundingClientRect();
+    return {x:btn.left-parent.left,y:btn.top-parent.top};
+  });
+  const noBefore=await position();
   await no.hover();
-  const noAfter=await no.boundingBox();
+  const noAfter=await position();
   expect(Math.abs(noAfter.x-noBefore.x)).toBeLessThan(1);
   expect(Math.abs(noAfter.y-noBefore.y)).toBeLessThan(1);
   await no.click();
@@ -689,6 +694,7 @@ test("phone portrait, tiny screens and landscape keep both invitation choices re
     {width:844,height:390}
   ]){
     await page.setViewportSize(size);
+    await page.waitForTimeout(780); // avoid sampling scene scale-in
     const metrics=await page.evaluate(()=>{
       const rect=selector=>{
         const r=document.querySelector(selector).getBoundingClientRect();

@@ -305,6 +305,15 @@
   lastHeart.addEventListener("click", launchHeartFinale);
   invitationYes.addEventListener("click",()=>chooseFireworks("yes"));
   invitationNo.addEventListener("click",()=>chooseFireworks("no"));
+  // Explicitly support hardware keyboards as well as touchscreen taps.
+  // Prevent native keyboard click synthesis so an answer is never selected twice.
+  function chooseViaKeyboard(event,answer) {
+    if (event.repeat || !["Enter"," ","Spacebar"].includes(event.key)) return;
+    event.preventDefault();
+    chooseFireworks(answer);
+  }
+  invitationYes.addEventListener("keydown",event=>chooseViaKeyboard(event,"yes"));
+  invitationNo.addEventListener("keydown",event=>chooseViaKeyboard(event,"no"));
   previous.addEventListener("click",back);
   nextButton.addEventListener("click",next);
   paper.addEventListener("scroll",() => {
