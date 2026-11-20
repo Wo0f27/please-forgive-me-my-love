@@ -1,4 +1,4 @@
-/* A Little Letter — v11
+/* A Little Letter — v12
    One letter with distinct extracting, unfolding, reading, refolding and
    reinserting phases. The final tap finishes the physical letter before
    opening the closing scene. No navigation bar or artificial page breaks. */
@@ -19,7 +19,8 @@
   const garden = document.querySelector("[data-bloom-scene]");
   const invitationYes = document.getElementById("invite-yes");
   const invitationNo = document.getElementById("invite-no");
-  const invitationAnswer = document.getElementById("invite-answer");
+  const invitationArea = document.getElementById("invite-play-area");
+  const invitationHeart = document.getElementById("invite-heart-result");
   const invitationSparkles = document.getElementById("invite-sparkles");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -30,6 +31,8 @@
   let generation = 0;
   let timers = [];
   let invitationEffectToken = 0;
+  let noHopCount = 0;
+  let invitationAccepted = false;
 
   const durations = {
     extract: 710, unfold: 620, expand: 640, heartBurst: 1650,
@@ -84,6 +87,7 @@
     old.setAttribute("aria-hidden","true");
     old.inert = true;
     const upcoming = scenes[index];
+    if (index === 2) resetInvitation();
     upcoming.classList.remove("was-before","was-after");
     upcoming.classList.add("is-current");
     upcoming.removeAttribute("aria-hidden");
@@ -194,42 +198,104 @@
   }
 
 
-  // A response stays local to the visitor's browser. Nothing is submitted,
-  // tracked or sent to the author. Both options are always tappable.
-  function chooseFireworks(answer) {
-    if (current !== 2) return;
-    const yes = answer === "yes";
-    invitationYes.setAttribute("aria-pressed", String(yes));
-    invitationNo.setAttribute("aria-pressed", String(!yes));
-    invitationAnswer.textContent = yes
-      ? "I'd love that. ♡ If you'd like to make plans, just tell me."
-      : "That's okay. Thank you for reading. ♡";
-
+  // The invitation is a playful, local-only interaction: No hops away
+  // within the card, while Yes triggers an animated button-to-heart merge.
+  // The browser's Back/Close controls always remain available.
+  function resetInvitation() {
     invitationEffectToken++;
-    const token = invitationEffectToken;
+    invitationAccepted = false;
+    noHopCount = 0;
+    invitationArea.classList.remove("is-merging","is-heart");
+    invitationYes.disabled = false;
+    invitationNo.disabled = false;
+    invitationYes.removeAttribute("aria-hidden");
+    invitationNo.removeAttribute("aria-hidden");
+    invitationNo.style.removeProperty("left");
+    invitationNo.style.removeProperty("top");
+    invitationHeart.setAttribute("aria-hidden","true");
     invitationSparkles.replaceChildren();
-    if (!yes || reducedMotion.matches) return;
+  }
 
-    const icons = ["💗","✨","💕","♡","✦","💖"];
-    const fragment = document.createDocumentFragment();
-    const count = 28;
-    for (let i=0;i<count;i++){
-      const sparkle = document.createElement("span");
-      sparkle.className = "invite-sparkle";
-      sparkle.textContent = icons[(i*5+i%4)%icons.length];
-      const radians = ((i*137.508)+15)*Math.PI/180;
-      const radius = 64+(i%7)*14;
+  function hopNo() {
+    if (current !== 2 || invitationAccepted) return;
+    const bounds = invitationArea.getBoundingClientRect();
+    const noBox = invitationNo.getBoundingClientRect();
+    const yesBox = invitationYes.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return;
+    const halfW = noBox.width / 2;
+    const halfH = noBox.height / 2;
+    const maxX = bounds.width-halfW-6;
+    const maxY = bounds.height-halfH-6;
+    const spots = [
+      [.76,.79],[.52,.82],[.24,.77],[.79,.50],
+      [.56,.72],[.83,.86],[.29,.72],[.72,.78],[.48,.88],[.76,.39]
+    ];
+    const previousX=noBox.left-bounds.left+halfW;
+    const previousY=noBox.top-bounds.top+halfH;
+    for(let n=0;n<spots.length;n++){
+      const [fx,fy]=spots[(noHopCount+n)%spots.length];
+      const x=Math.max(halfW+6,Math.min(maxX,bounds.width*fx));
+      const y=Math.max(halfH+6,Math.min(maxY,bounds.height*fy));
+      const left=bounds.left+x-halfW;
+      const top=bounds.top+y-halfH;
+      const overlapsYes = (
+        left < yesBox.right+8 && left+noBox.width > yesBox.left-8 &&
+        top < yesBox.bottom+8 && top+noBox.height > yesBox.top-8
+      );
+      if(overlapsYes || Math.hypot(x-previousX,y-previousY)<22) continue;
+      noHopCount=(noHopCount+n+1)%spots.length;
+      invitationNo.style.left=x+"px";
+      invitationNo.style.top=y+"px";
+      return;
+    }
+    // Even in a very narrow viewport, keep the hopping button contained.
+    noHopCount=(noHopCount+1)%spots.length;
+    invitationNo.style.left=Math.max(halfW+6,Math.min(maxX,bounds.width*.76))+"px";
+    invitationNo.style.top=Math.max(halfH+6,Math.min(maxY,bounds.height*.83))+"px";
+  }
+
+  function celebrateInvitation() {
+    const token=++invitationEffectToken;
+    invitationSparkles.replaceChildren();
+    if(reducedMotion.matches) return;
+    const icons=["💗","✨","💕","♡","✦","💖"];
+    const fragment=document.createDocumentFragment();
+    for(let i=0;i<30;i++){
+      const sparkle=document.createElement("span");
+      sparkle.className="invite-sparkle";
+      sparkle.textContent=icons[(i*5+i%4)%icons.length];
+      const radians=(i*137.508+15)*Math.PI/180;
+      const radius=60+(i%7)*18;
       sparkle.style.setProperty("--dx",Math.round(Math.cos(radians)*radius)+"px");
-      sparkle.style.setProperty("--dy",Math.round(Math.sin(radians)*radius-32)+"px");
+      sparkle.style.setProperty("--dy",Math.round(Math.sin(radians)*radius-38)+"px");
       sparkle.style.setProperty("--turn",((-90+i*27)%180)+"deg");
-      sparkle.style.setProperty("--delay",((i%7)*28)+"ms");
-      sparkle.style.setProperty("--size",(15+(i%5)*4)+"px");
+      sparkle.style.setProperty("--delay",(i%7*30)+"ms");
+      sparkle.style.setProperty("--size",(16+(i%5)*4)+"px");
       fragment.appendChild(sparkle);
     }
     invitationSparkles.appendChild(fragment);
-    setTimeout(() => {
-      if (token === invitationEffectToken) invitationSparkles.replaceChildren();
-    },1450);
+    setTimeout(()=>{
+      if(token===invitationEffectToken) invitationSparkles.replaceChildren();
+    },1500);
+  }
+
+  function chooseFireworks(answer) {
+    if(current!==2 || invitationAccepted) return;
+    if(answer==="no") { hopNo(); return; }
+    invitationAccepted=true;
+    invitationYes.disabled=true;
+    invitationNo.disabled=true;
+    invitationArea.classList.add("is-merging");
+    announce("i love you");
+    const token=++invitationEffectToken;
+    setTimeout(()=>{
+      if(token!==invitationEffectToken || current!==2) return;
+      invitationArea.classList.add("is-heart");
+      invitationHeart.setAttribute("aria-hidden","false");
+      invitationYes.setAttribute("aria-hidden","true");
+      invitationNo.setAttribute("aria-hidden","true");
+      celebrateInvitation();
+    },reducedMotion.matches?0:590);
   }
 
   function closeEnvelope(advanceToEnding = false) {
@@ -305,6 +371,13 @@
   lastHeart.addEventListener("click", launchHeartFinale);
   invitationYes.addEventListener("click",()=>chooseFireworks("yes"));
   invitationNo.addEventListener("click",()=>chooseFireworks("no"));
+  window.addEventListener("resize",()=>{
+    if(current===2 && !invitationAccepted && noHopCount>0) {
+      invitationNo.style.removeProperty("left");
+      invitationNo.style.removeProperty("top");
+      hopNo();
+    }
+  },{passive:true});
   // Explicitly support hardware keyboards as well as touchscreen taps.
   // Prevent native keyboard click synthesis so an answer is never selected twice.
   function chooseViaKeyboard(event,answer) {

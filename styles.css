@@ -782,3 +782,116 @@ body{background:#fff1e9;color:var(--text)}
 @media(max-height:530px) and (orientation:landscape){
   .invite-choice{min-height:48px}
 }
+
+
+/* V12: reel-style invitation — only the question, Yes, No, and the heart.
+   The No button stays within this play area, including on narrow phones.
+   Buttons meet at the center before the heart becomes visible. */
+.fireworks-ending{gap:clamp(8px,1.7vh,14px)}
+.fireworks-ending .invite-window{
+  max-width:455px;border-radius:17px;
+  background:linear-gradient(150deg,#fff8f6 0%,#ffebf2 56%,#fff8f0 100%);
+  overflow:visible;
+}
+.fireworks-ending .invite-window-body{
+  padding:clamp(18px,3.5vw,25px) clamp(12px,3vw,20px) 11px;
+  gap:7px;
+}
+.fireworks-ending .invite-window h2{
+  font:500 clamp(23px,4.4vw,34px)/1.3 Georgia,serif;
+  color:#86506d;
+  max-width:410px;
+  margin:0;
+  text-wrap:balance;
+}
+.invite-play-area{
+  position:relative;isolation:isolate;
+  height:176px;width:100%;max-width:430px;
+  margin:0 auto;
+}
+.invite-play-area .invite-choice{
+  position:absolute;display:flex;align-items:center;justify-content:center;
+  width:clamp(112px,31vw,144px);
+  height:54px;min-height:54px;max-width:none;min-width:0;
+  margin:0;flex:none;
+  left:26%;top:46px;
+  transform:translate(-50%,-50%) scale(1);
+  font:600 clamp(16px,3.8vw,19px)/1.1 Georgia,serif;
+  border-radius:12px;z-index:3;opacity:1;
+  user-select:none;-webkit-user-select:none;
+  touch-action:manipulation;
+  transition:left .28s cubic-bezier(.18,.75,.29,1.12),
+    top .28s cubic-bezier(.18,.75,.29,1.12),
+    transform .48s cubic-bezier(.22,.81,.28,1),
+    opacity .35s ease,background .2s ease;
+}
+.invite-play-area .invite-no{left:74%;top:46px}
+.invite-play-area .invite-yes{z-index:4}
+.invite-play-area.is-merging .invite-choice{
+  left:50%!important;top:53%!important;
+  transform:translate(-50%,-50%) scale(.06);
+  opacity:0;pointer-events:none;
+}
+.invite-heart-result{
+  position:absolute;z-index:6;left:50%;top:53%;
+  width:190px;height:174px;
+  transform:translate(-50%,-50%) scale(.08);
+  opacity:0;visibility:hidden;pointer-events:none;
+  display:grid;place-items:center;
+  transition:transform .47s cubic-bezier(.19,.86,.25,1.2),
+    opacity .32s ease,visibility 0s linear .47s;
+  filter:drop-shadow(0 9px 15px #b26c8f3d);
+}
+.invite-heart-shape{
+  width:100%;height:100%;grid-area:1/1;
+  fill:#dc819e;
+  filter:drop-shadow(0 1px 0 #f8d7e2);
+}
+.invite-heart-result span{
+  grid-area:1/1;z-index:1;
+  position:relative;top:-2px;
+  color:#fffaf6;text-align:center;
+  white-space:nowrap;
+  font:italic 600 clamp(18px,4vw,23px)/1.1 Georgia,serif;
+  text-shadow:0 1px 2px #9554728a;
+}
+.invite-play-area.is-heart .invite-heart-result{
+  transform:translate(-50%,-50%) scale(1);
+  opacity:1;visibility:visible;
+  transition:transform .47s cubic-bezier(.19,.86,.25,1.2),
+    opacity .3s ease,visibility 0s;
+}
+.fireworks-ending .invite-sparkles{
+  top:0;left:0;right:0;bottom:0;
+}
+@media(max-width:480px){
+  .fireworks-ending .invite-window-body{padding:16px 12px 8px}
+  .fireworks-ending .invite-window h2{font-size:clamp(22px,6.25vw,29px)}
+  .invite-play-area{height:168px}
+  .invite-play-area .invite-choice{
+    width:clamp(108px,33vw,132px);
+    height:52px;min-height:52px;
+  }
+  .invite-heart-result{width:178px;height:164px}
+}
+@media(max-width:345px){
+  .fireworks-ending .invite-window h2{font-size:22px}
+  .invite-play-area .invite-choice{width:108px;min-width:0}
+}
+@media(max-height:530px) and (orientation:landscape){
+  .fireworks-ending .invite-window-body{padding:11px 10px 3px;gap:1px}
+  .fireworks-ending .invite-window h2{font-size:clamp(18px,2.8vw,24px)}
+  .invite-play-area{height:137px}
+  .invite-play-area .invite-choice{
+    height:48px;min-height:48px;top:38px;
+    width:clamp(105px,15vw,130px);
+  }
+  .invite-play-area .invite-no{top:38px}
+  .invite-heart-result{height:124px;width:137px}
+  .invite-heart-result span{font-size:17px}
+}
+@media(prefers-reduced-motion:reduce){
+  .invite-play-area .invite-choice,.invite-heart-result{
+    transition:none!important;
+  }
+}
