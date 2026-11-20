@@ -1,4 +1,4 @@
-/* A Little Letter — v12
+/* A Little Letter — v13
    One letter with distinct extracting, unfolding, reading, refolding and
    reinserting phases. The final tap finishes the physical letter before
    opening the closing scene. No navigation bar or artificial page breaks. */
@@ -17,6 +17,7 @@
   const petals = document.getElementById("scene-petals");
   const heartLayer = document.getElementById("heart-burst");
   const garden = document.querySelector("[data-bloom-scene]");
+  const finaleBouquetLayer = document.getElementById("finale-bouquet-layer");
   const invitationYes = document.getElementById("invite-yes");
   const invitationNo = document.getElementById("invite-no");
   const invitationArea = document.getElementById("invite-play-area");
@@ -35,7 +36,7 @@
   let invitationAccepted = false;
 
   const durations = {
-    extract: 710, unfold: 620, expand: 640, heartBurst: 1650,
+    extract: 710, unfold: 620, expand: 640, heartBurst: 2150,
     refold: 660, insert: 550, seal: 630, finalHold: 160, settle: 80
   };
 
@@ -118,7 +119,6 @@
     lastHeart.disabled = phase !== "reading";
     lastHeart.classList.toggle("is-ready",phase === "reading" && readingAtEnd());
     updateButtons();
-    if (reading) maybeBloom();
   }
 
   function openEnvelope() {
@@ -145,7 +145,6 @@
           schedule(() => {
             if (phase === "reading") {
               paper.scrollTop = Math.max(0,Math.min(rememberedScrollTop,paper.scrollHeight-paper.clientHeight));
-              maybeBloom();
               updateButtons();
             }
           },durations.settle);
@@ -182,15 +181,40 @@
     heartLayer.appendChild(fragment);
   }
 
+  // The wrapped flowers are held as a hidden source illustration inside
+  // the parchment. They appear in the viewport only when the last heart is
+  // pressed, so the recipient can actually watch the bouquet being created.
+  function createFinaleBouquet() {
+    finaleBouquetLayer.replaceChildren();
+    const bouquet = garden.cloneNode(true);
+    bouquet.removeAttribute("data-bloom-scene");
+    bouquet.removeAttribute("role");
+    bouquet.removeAttribute("aria-label");
+    bouquet.setAttribute("aria-hidden","true");
+    bouquet.classList.remove("is-blooming","is-grown");
+    bouquet.classList.add("is-final-bouquet");
+    finaleBouquetLayer.appendChild(bouquet);
+    finaleBouquetLayer.classList.add("is-showing");
+    if (reducedMotion.matches) {
+      bouquet.classList.add("is-created");
+    } else {
+      void bouquet.offsetWidth;
+      bouquet.classList.add("is-creating");
+    }
+  }
+
   function launchHeartFinale() {
     if (phase !== "reading" || !readingAtEnd()) return;
     cancelSequence();
     phase = "heartburst";
     syncEnvelope();
+    createFinaleBouquet();
     burstHearts();
-    announce("Lots of love for you.");
+    announce("A bouquet of flowers and lots of love for you.");
     schedule(() => {
       heartLayer.replaceChildren();
+      finaleBouquetLayer.classList.remove("is-showing");
+      finaleBouquetLayer.replaceChildren();
       phase = "reading";
       syncEnvelope();
       closeEnvelope(true);
@@ -348,24 +372,6 @@
     }
   }
 
-  function maybeBloom() {
-    if (!garden || garden.classList.contains("is-blooming") || phase !== "reading") return;
-    if (reducedMotion.matches) {
-      garden.classList.add("is-blooming");
-      return;
-    }
-    const g = garden.getBoundingClientRect();
-    const p = paper.getBoundingClientRect();
-    const visible = Math.min(g.bottom,p.bottom)-Math.max(g.top,p.top);
-    // A direct jump to the very end should never show a vacant flower
-    // placeholder. Slow reading still gets the stem-and-petal animation.
-    if (readingAtEnd() || g.bottom < p.top) {
-      garden.classList.add("is-blooming","is-grown");
-      return;
-    }
-    if (visible >= Math.min(70,g.height*.25)) garden.classList.add("is-blooming");
-  }
-
   document.getElementById("start-reading").addEventListener("click", () => go(1));
   cover.addEventListener("click",openEnvelope);
   lastHeart.addEventListener("click", launchHeartFinale);
@@ -391,7 +397,6 @@
   nextButton.addEventListener("click",next);
   paper.addEventListener("scroll",() => {
     if (phase === "reading") {
-      maybeBloom();
       lastHeart.classList.toggle("is-ready",readingAtEnd());
       updateButtons();
     }
@@ -445,5 +450,4 @@
   });
 
   syncEnvelope();
-  if (reducedMotion.matches && garden) garden.classList.add("is-blooming");
 })();
