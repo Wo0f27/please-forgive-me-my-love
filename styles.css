@@ -895,3 +895,18 @@ body{background:#fff1e9;color:var(--text)}
     transition:none!important;
   }
 }
+
+
+/* Keep the love message above the sparkle layer and legible throughout
+   the final frame rather than letting the particles cover its letters. */
+.fireworks-ending .invite-window-body{z-index:7}
+.invite-heart-shape{fill:#cf7194}
+.invite-heart-result span{
+  color:#fffdf8;
+  top:-4px;
+  font:700 clamp(21px,4.8vw,26px)/1.1 Georgia,serif;
+  text-shadow:0 2px 3px #8f4968c9,0 0 2px #8f496899;
+}
+@media(max-height:530px) and (orientation:landscape){
+  .invite-heart-result span{font-size:19px}
+}
