@@ -735,11 +735,23 @@ test("answer selection never sends an RSVP or request to another service", async
 test("invitation buttons work with keyboard and reduced motion skips confetti", async ({page}) => {
   await page.emulateMedia({reducedMotion:"reduce"});
   await reachFireworksInvitation(page);
-  await page.locator("#invite-yes").press("Enter");
-  await expect(page.locator("#invite-yes")).toHaveAttribute("aria-pressed","true");
+  await page.waitForTimeout(750); // scene must finish becoming focusable before keys
+  const yes=page.locator("#invite-yes");
+  const no=page.locator("#invite-no");
+  await expect(yes).toBeVisible();
+  await expect.poll(async()=>{
+    await yes.focus();
+    return yes.evaluate(el=>document.activeElement===el);
+  },{timeout:3500}).toBe(true);
+  await page.keyboard.press("Enter");
+  await expect(yes).toHaveAttribute("aria-pressed","true");
   await expect(page.locator("#invite-answer")).toContainText("I'd love that");
   await expect(page.locator("#invite-sparkles")).toBeEmpty();
-  await page.locator("#invite-no").press("Space");
-  await expect(page.locator("#invite-no")).toHaveAttribute("aria-pressed","true");
+  await expect.poll(async()=>{
+    await no.focus();
+    return no.evaluate(el=>document.activeElement===el);
+  },{timeout:3500}).toBe(true);
+  await page.keyboard.press("Space");
+  await expect(no).toHaveAttribute("aria-pressed","true");
   await expect(page.locator("#invite-answer")).toContainText("That's okay");
 });
