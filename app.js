@@ -40,11 +40,11 @@
     refold: 660, insert: 550, seal: 630, finalHold: 160, settle: 80
   };
 
-  function schedule(callback, duration) {
+  function schedule(callback, duration, retainDuration = false) {
     const token = generation;
     const id = setTimeout(() => {
       if (token === generation) callback();
-    }, reducedMotion.matches ? 0 : duration);
+    }, reducedMotion.matches && !retainDuration ? 0 : duration);
     timers.push(id);
   }
 
@@ -218,7 +218,7 @@
       phase = "reading";
       syncEnvelope();
       closeEnvelope(true);
-    }, durations.heartBurst);
+    }, reducedMotion.matches ? 1000 : durations.heartBurst, true);
   }
 
 
