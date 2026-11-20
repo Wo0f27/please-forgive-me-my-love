@@ -705,6 +705,13 @@ test("Yes pulls both buttons together and turns into an i love you heart", async
   await expect(page.locator("#invite-heart-result")).toBeVisible();
   await expect(page.locator("#invite-heart-result")).toHaveText("i love you");
   await expect(page.locator("#invite-sparkles .invite-sparkle")).toHaveCount(30);
+  await page.waitForTimeout(530); // capture the settled heart, not its first frame
+  const contrast=await page.locator("#invite-heart-result span").evaluate(el=>({
+    size:parseFloat(getComputedStyle(el).fontSize),
+    stack:getComputedStyle(el.closest(".invite-window-body")).zIndex
+  }));
+  expect(contrast.size).toBeGreaterThanOrEqual(19);
+  expect(Number(contrast.stack)).toBeGreaterThan(4);
   await page.screenshot({path:test.info().outputPath("merged-heart.png"),fullPage:false});
   await expect(page.locator("#one-last-thing")).toHaveClass(/is-current/);
 });
